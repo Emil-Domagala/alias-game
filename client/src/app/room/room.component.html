@@ -1,0 +1,10 @@
+<h2>Room {{ roomId }}</h2>
+
+<button (click)="leaveRoom()">Leave Room</button>
+
+<h3>Events</h3>
+<ul>
+  <li *ngFor="let event of roomEvents">
+    {{ event.type }}: {{ event.payload | json }}
+  </li>
+</ul>

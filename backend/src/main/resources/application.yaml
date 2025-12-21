@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: alias
+  profiles:
+    active: local
+
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:alias}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+server:
+  servlet:
+    session:
+      timeout: 30m
+
+app:
+  frontend:
+    url: http://localhost:*
+    domain: localhost
+
+session:
+  cookie:
+    auth:
+      name: SESSIONID
+      maxAge: 1h
+  jwt:
+    secret: FWFy678FEWF7632gfwen89dsffewrfeqwffd37r6FEWHIFsdabhjb57FDEWF
