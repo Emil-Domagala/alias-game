@@ -3,6 +3,7 @@ package game.alias.room;
 import game.alias.auth.AuthUser;
 import game.alias.room.domains.Room;
 import game.alias.room.domains.RoomException;
+import game.alias.room.domains.RoomStatus;
 import game.alias.room.domains.request.CreateRoomRequest;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -77,8 +78,9 @@ public class RoomServiceImpl implements RoomService{
                 throw new RoomException("You are not the owner of this room");
             }
 
-            // TODO: Check if game is running
-            // if (room.isGameRunning()) throw ...
+          if(room.getStatus()== RoomStatus.IN_GAME){
+              throw new RoomException("Room is in game and cannot be deleted");
+          }
 
             roomRepository.delete(room);
 
@@ -103,9 +105,28 @@ public class RoomServiceImpl implements RoomService{
 
         try{
             Room room = loadRoomOrThrow(roomId);
-//            TODO: if game is on lock room
-//            TODO: check if room should be deleted (last player or owner)
-            throw new NotImplementedException();
+            if(room.getStatus()==RoomStatus.IN_GAME){
+                throw new RoomException("Room is in game and cannot be left");
+            }
+
+            if(!room.getPlayersId().contains(user.getId())){
+                throw new RoomException("User is not a member of this room");
+            }
+
+            if(room.getOwnerId().equals(user.getId())){
+                delete(roomId, user);
+            }
+
+            room.getPlayersId().remove(user.getId());
+
+            if(room.getPlayersId().size()<room.getMinPlayers()){
+                room.setStatus(RoomStatus.WAITING);
+            }
+
+            roomRepository.save(room);
+
+            roomEventPublisher.playerLeft(room.getId(), user.getId());
+            return room;
         }finally {
             redisTemplate.delete(lockKey);
         }
@@ -127,15 +148,21 @@ public class RoomServiceImpl implements RoomService{
             Room room = loadRoomOrThrow(roomId);
 
             if (room.getPlayersId().contains(user.getId())) {
-                return room;
+                throw new RoomException("You are already a member of this room");
             }
-//            TODO: If game is on lock room;
+            if (room.getStatus() != RoomStatus.WAITING) {
+                throw new RoomException("Room is not in waiting state");
+            }
 
             if (room.getPlayersId().size() >= room.getMaxPlayers()) {
                 throw new RoomException("Room is full");
             }
 
             room.getPlayersId().add(user.getId());
+
+            if(room.getPlayersId().size()==room.getMaxPlayers()){
+                room.setStatus(RoomStatus.FULL);
+            }
 
             roomRepository.save(room);
 

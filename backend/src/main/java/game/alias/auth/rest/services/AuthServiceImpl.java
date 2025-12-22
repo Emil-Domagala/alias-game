@@ -15,7 +15,7 @@ import game.alias.auth.domains.request.UserLoginRequest;
 import game.alias.auth.domains.request.UserRegisterRequest;
 import game.alias.auth.session.JwtService;
 import game.alias.auth.session.RedisAuthUserService;
-import game.alias.user.User;
+import game.alias.user.domains.User;
 import game.alias.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 

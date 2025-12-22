@@ -1,4 +1,6 @@
 package game.alias.room.domains.event.dto;
 
-public record RoomPlayerLeftEventDto() {
+import game.alias.room.domains.dto.RoomDto;
+
+public record RoomPlayerLeftEventDto(RoomDto room) {
 }

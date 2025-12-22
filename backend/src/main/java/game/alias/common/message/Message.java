@@ -1,9 +1,7 @@
 package game.alias.common.message;
 
 import game.alias.common.BaseRedisEntity;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.redis.core.RedisHash;
 
 import java.util.UUID;
@@ -11,6 +9,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @RedisHash("message")
 public class Message extends BaseRedisEntity {
     private UUID senderId;

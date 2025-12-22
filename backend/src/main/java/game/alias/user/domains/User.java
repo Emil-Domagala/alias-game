@@ -1,4 +1,4 @@
-package game.alias.user;
+package game.alias.user.domains;
 
 import java.util.HashSet;
 import java.util.Set;

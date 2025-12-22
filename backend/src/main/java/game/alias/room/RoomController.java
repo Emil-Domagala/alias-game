@@ -27,7 +27,7 @@ public class RoomController {
     @PostMapping("/create")
     public ResponseEntity<RoomDto>createRoom(@Valid @RequestBody CreateRoomRequest request, @AuthenticationPrincipal AuthUser user){
         var room = service.create(request, user);
-        var roomDto = mapper.toDto(room);
+        var roomDto = mapper.toRoomDto(room);
         URI location = URI.create("/room/" + room.getId());
         return ResponseEntity.created(location).body(roomDto);
     }
