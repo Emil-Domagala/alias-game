@@ -1,0 +1,36 @@
+import { Injectable } from '@angular/core';
+import {HttpClient, HttpParams} from '@angular/common/http';
+import {environment} from '../environment';
+
+export const API = {
+  V1: {
+    PUBLIC: '/api/v1/public',
+    PRIVATE: '/api/v1/private',
+    ADMIN: '/api/v1/admin'
+  }
+} as const;
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ApiService {
+  private readonly baseUrl = environment.apiUrl;
+
+  constructor(private http: HttpClient) {}
+
+  get<T>(url: string, params?: HttpParams) {
+    return this.http.get<T>(`${this.baseUrl}${url}`, { params });
+  }
+
+  post<T>(url: string, body: unknown) {
+    return this.http.post<T>(`${this.baseUrl}${url}`, body);
+  }
+
+  put<T>(url: string, body: unknown) {
+    return this.http.put<T>(`${this.baseUrl}${url}`, body);
+  }
+
+  delete<T>(url: string) {
+    return this.http.delete<T>(`${this.baseUrl}${url}`);
+  }
+}

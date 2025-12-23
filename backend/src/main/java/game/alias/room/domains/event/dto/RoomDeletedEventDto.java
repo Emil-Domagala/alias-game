@@ -1,4 +1,6 @@
 package game.alias.room.domains.event.dto;
 
-public record RoomDeletedEventDto() {
+import java.util.UUID;
+
+public record RoomDeletedEventDto(UUID roomId) {
 }
