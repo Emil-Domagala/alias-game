@@ -16,8 +16,7 @@
     "importHelpers": true,
     "target": "ES2022",
     "module": "ES2022",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "esModuleInterop": true
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

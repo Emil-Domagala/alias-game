@@ -4,7 +4,9 @@
 
 <h3>Events</h3>
 <ul>
-  <li *ngFor="let event of roomEvents">
-    {{ event.type }}: {{ event.payload | json }}
-  </li>
+  @for (event of roomEvents; track event) {
+    <li>
+      {{ event.type }}: {{ event.payload | json }}
+    </li>
+  }
 </ul>
