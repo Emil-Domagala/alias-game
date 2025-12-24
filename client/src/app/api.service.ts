@@ -19,18 +19,18 @@ export class ApiService {
   constructor(private http: HttpClient) {}
 
   get<T>(url: string, params?: HttpParams) {
-    return this.http.get<T>(`${this.baseUrl}${url}`, { params });
+    return this.http.get<T>(`${this.baseUrl}${url}`, { params, withCredentials: true });
   }
 
   post<T>(url: string, body: unknown) {
-    return this.http.post<T>(`${this.baseUrl}${url}`, body);
+    return this.http.post<T>(`${this.baseUrl}${url}`, body,{ withCredentials: true });
   }
 
   put<T>(url: string, body: unknown) {
-    return this.http.put<T>(`${this.baseUrl}${url}`, body);
+    return this.http.put<T>(`${this.baseUrl}${url}`, body,{ withCredentials: true });
   }
 
   delete<T>(url: string) {
-    return this.http.delete<T>(`${this.baseUrl}${url}`);
+    return this.http.delete<T>(`${this.baseUrl}${url}`,{ withCredentials: true });
   }
 }

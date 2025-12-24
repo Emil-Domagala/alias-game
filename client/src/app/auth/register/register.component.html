@@ -1,1 +1,37 @@
-<p>register works!</p>
+<form (submit)="submit($event)">
+
+  <input
+    type="email"
+    [field]="registerForm.email"
+  />
+
+  @if (registerForm.email().touched() &&
+  !registerForm.email().valid()) {
+    <p>Invalid email</p>
+  }
+
+  <input
+    type="text"
+    [field]="registerForm.nick"
+  />
+
+  @if (registerForm.nick().touched() &&
+  !registerForm.nick().valid()) {
+    <p>Invalid username</p>
+  }
+
+  <input
+    type="password"
+    [field]="registerForm.password"
+  />
+
+  @if (registerForm.password().touched() &&
+  !registerForm.password().valid()) {
+    <p>Invalid password</p>
+  }
+
+  <button type="submit" [disabled]="registerForm().invalid()">
+    Register
+  </button>
+
+</form>

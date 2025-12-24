@@ -1,31 +1,62 @@
-import { Injectable } from '@angular/core';
-import SockJS from 'sockjs-client';
-import * as Stomp from 'stompjs';
+import { Injectable, signal } from '@angular/core';
+import { Client, IMessage, StompSubscription } from '@stomp/stompjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class WebSocketService {
 
-  private stompClient?: Stomp.Client;
+  private client?: Client;
+  readonly connected = signal(false);
 
-  connect(token?: string): void {
-    const socket = new SockJS('http://localhost:8080/ws');
-    this.stompClient = Stomp.over(socket);
+  connect(onConnected?: () => void): void {
+    if (this.client?.active) return;
 
-    this.stompClient.connect(
-      token ? {Authorization: `Bearer ${token}`} : {},
-      () => console.log('WS connected')
-    );
+    this.client = new Client({
+      brokerURL: 'ws://localhost:8080/ws',
+
+      reconnectDelay: 5000,
+      heartbeatIncoming: 10000,
+      heartbeatOutgoing: 10000,
+
+      onConnect: () => {
+        this.connected.set(true);
+        console.log('WS connected');
+        onConnected?.();
+      },
+
+      onDisconnect: () => {
+        this.connected.set(false);
+        console.log('WS disconnected');
+      },
+
+      onStompError: frame => {
+        console.error('STOMP error:', frame.headers['message']);
+        console.error(frame.body);
+      },
+    });
+
+    this.client.activate();
   }
 
-  subscribe(destination: string, callback: (msg: any) => void): Stomp.Subscription | undefined {
-    return this.stompClient?.subscribe(destination, message =>
-      callback(JSON.parse(message.body))
-    );
+  subscribe<T>(
+    destination: string,
+    callback: (payload: T) => void
+  ): StompSubscription | undefined {
+    if (!this.client || !this.connected()) {
+      console.warn('STOMP not connected');
+      return;
+    }
+
+    return this.client.subscribe(destination, (message: IMessage) => {
+      callback(JSON.parse(message.body) as T);
+    });
   }
 
   disconnect(): void {
-    this.stompClient?.disconnect(() => console.log('WS disconnected'));
+    if (!this.client) return;
+
+    this.client.deactivate();
+    this.client = undefined;
   }
 }

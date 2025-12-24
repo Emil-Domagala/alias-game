@@ -1,1 +1,28 @@
-<p>login works!</p>
+<form (submit)="submit($event)">
+
+  <input
+    type="email"
+    [field]="loginForm.email"
+  />
+
+  @if (loginForm.email().touched() &&
+  !loginForm.email().valid()) {
+    <p>Invalid email</p>
+  }
+
+
+  <input
+    type="password"
+    [field]="loginForm.password"
+  />
+
+  @if (loginForm.password().touched() &&
+  !loginForm.password().valid()) {
+    <p>Invalid password</p>
+  }
+
+  <button type="submit" [disabled]="loginForm().invalid()">
+    Register
+  </button>
+
+</form>

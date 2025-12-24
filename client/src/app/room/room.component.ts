@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { WebSocketService } from '../web-socket.service';
-import {Subscription} from 'stompjs';
 import {JsonPipe} from '@angular/common';
+import {StompSubscription} from '@stomp/stompjs';
 
 interface RoomEvent {
   type: string;
@@ -19,7 +19,7 @@ interface RoomEvent {
   styleUrls: ['./room.component.scss']
 })
 export class RoomComponent implements OnInit, OnDestroy {
-  private wsSub?: Subscription;
+  private wsSub?: StompSubscription;
   roomId!: string;
 
   roomEvents: RoomEvent[] = [];
