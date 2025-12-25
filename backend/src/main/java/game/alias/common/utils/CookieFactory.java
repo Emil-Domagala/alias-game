@@ -13,8 +13,11 @@ public final class CookieFactory {
     public CookieFactory(
             @Value("${spring.profiles.active}") String activeProfile,
             @Value("${app.frontend.domain}") String domainName) {
-        this.secure = !"local".equals(activeProfile);
-        this.domainName = "." + domainName;
+
+        boolean isLocal = "local".equals(activeProfile);
+
+        this.secure = !isLocal;
+        this.domainName = isLocal ? null : domainName;
     }
 
     public ResponseCookie.ResponseCookieBuilder base(@NonNull String name, @NonNull String value) {
@@ -22,7 +25,7 @@ public final class CookieFactory {
                 .httpOnly(true)
                 .secure(secure)
                 .domain(domainName)
-                .sameSite("Strict");
+                .sameSite("Lax");
     }
 
 }

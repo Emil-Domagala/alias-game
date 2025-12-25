@@ -1,6 +1,7 @@
 package game.alias.room.domains.dto;
 
 import game.alias.room.domains.RoomStatus;
+import game.alias.player.domains.dto.PlayerDto;
 
 import java.util.Set;
 import java.util.UUID;
@@ -8,7 +9,7 @@ import java.util.UUID;
 public record RoomDto(
         UUID id,
         String name,
-        UUID ownerId,
+        PlayerDto owner,
         int maxPlayers,
         int minPlayers,
         int playersCount,

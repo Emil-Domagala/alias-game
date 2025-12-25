@@ -6,6 +6,7 @@ import game.alias.common.pagination.PaginationResult;
 import game.alias.room.domains.RoomMapper;
 import game.alias.room.domains.dto.RoomDto;
 import game.alias.room.domains.request.CreateRoomRequest;
+import game.alias.player.PlayerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -23,11 +24,13 @@ public class RoomController {
 
     private final RoomService service;
     private final RoomMapper mapper;
+    private final PlayerService playerService;
 
     @PostMapping("/create")
     public ResponseEntity<RoomDto>createRoom(@Valid @RequestBody CreateRoomRequest request, @AuthenticationPrincipal AuthUser user){
         var room = service.create(request, user);
-        var roomDto = mapper.toRoomDto(room);
+        var player = playerService.cashePlayer(user);
+        var roomDto = mapper.toRoomDto(room, player);
         URI location = URI.create("/room/" + room.getId());
         return ResponseEntity.created(location).body(roomDto);
     }

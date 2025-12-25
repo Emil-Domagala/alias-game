@@ -7,7 +7,7 @@ import lombok.Data;
 
 public record AuthUserDto(
         String email,
-        String username,
+        String nick,
         Set<UserRole> roles
 ) {
 }

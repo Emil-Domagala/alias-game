@@ -1,27 +1,30 @@
 package game.alias.common;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import org.springframework.data.redis.core.TimeToLive;
 
 @Getter
 @Setter
+@SuperBuilder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class BaseRedisEntity {
     @Id
     @EqualsAndHashCode.Include
+    @Builder.Default
     protected UUID id = UUID.randomUUID();
 
+    @Builder.Default
     protected Instant createdAt = Instant.now();
-    protected Instant updatedAt = Instant.now();
 
-    public void touch() {
-        this.updatedAt = Instant.now();
-    }
-
+    @TimeToLive
+    protected Duration ttl;
 }

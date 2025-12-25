@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 public record UserRegisterRequest(
         @NotBlank(message = "Email is required") @Email(message = "Invalid email format") String email,
 
-        @NotBlank(message = "Username is required") @Size(min = UserConstraints.MIN_USERNAME, max = UserConstraints.MAX_USERNAME, message = "Username must be between {min} and {max} characters") String username,
+        @NotBlank(message = "Nick is required") @Size(min = UserConstraints.MIN_NICK, max = UserConstraints.MAX_NICK, message = "Nick must be between {min} and {max} characters") String nick,
 
         @NotBlank(message = "Password is required") @Size(min = UserConstraints.MIN_PASSWORD, max = UserConstraints.MAX_PASSWORD, message = "Password must be at least {min} and {max} characters long") String password) {
 }

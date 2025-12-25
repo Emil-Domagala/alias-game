@@ -15,7 +15,7 @@ public class AuthUserMapper {
 
         return new AuthUserDto(
                 user.getEmail(),
-                user.getUsername(),
+                user.getNick(),
                 user.getRoles()
         );
     }
@@ -27,7 +27,7 @@ public class AuthUserMapper {
 
         return new AuthUserDto(
                 authUser.getEmail(),
-                authUser.getUsername(),
+                authUser.getNick(),
                 authUser.getRoles()
         );
     }

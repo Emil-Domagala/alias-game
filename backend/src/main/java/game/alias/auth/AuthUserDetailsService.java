@@ -22,6 +22,7 @@ public class AuthUserDetailsService implements UserDetailsService {
         return new AuthUser(
                 user.getId(),
                 user.getEmail(),
+                user.getNick(),
                 user.getPassword(),
                 user.getRoles());
     }

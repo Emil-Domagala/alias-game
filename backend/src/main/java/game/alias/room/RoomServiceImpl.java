@@ -7,7 +7,6 @@ import game.alias.room.domains.RoomStatus;
 import game.alias.room.domains.request.CreateRoomRequest;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +19,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class RoomServiceImpl implements RoomService{
-    private final RoomRepository roomRepository;
+    private final RoomCacheRepository roomCacheRepository;
     private final StringRedisTemplate redisTemplate;
     private final RoomEventPublisher roomEventPublisher;
 
@@ -35,7 +34,7 @@ public class RoomServiceImpl implements RoomService{
             throw new RoomException("Room creation already in progress");
         }
         try {
-            Optional<Room> existingRoom = roomRepository.findByOwnerId(user.getId());
+            Optional<Room> existingRoom = roomCacheRepository.findByOwnerId(user.getId());
             if (existingRoom.isPresent()) {
                 throw new RoomException("You already own room with ID: " + existingRoom.get().getId());
             }
@@ -47,8 +46,9 @@ public class RoomServiceImpl implements RoomService{
                     .maxPlayers(request.maxPlayers())
                     .minPlayers(request.minPlayers())
                     .playersId(players)
+                    .ttl(Duration.ofHours(1))
                     .build();
-           var savedRoom =  roomRepository.save(roomToSave);
+           var savedRoom =  roomCacheRepository.save(roomToSave);
 
            roomEventPublisher.roomCreated(savedRoom);
 
@@ -70,7 +70,7 @@ public class RoomServiceImpl implements RoomService{
         }
 
         try {
-            Room room = roomRepository.findById(roomId).orElseThrow(
+            Room room = roomCacheRepository.findById(roomId).orElseThrow(
                     () -> new EntityNotFoundException("Room with such ID does not exist")
             );
 
@@ -82,7 +82,7 @@ public class RoomServiceImpl implements RoomService{
               throw new RoomException("Room is in game and cannot be deleted");
           }
 
-            roomRepository.delete(room);
+            roomCacheRepository.delete(room);
 
             roomEventPublisher.roomDeleted(room);
 
@@ -123,7 +123,7 @@ public class RoomServiceImpl implements RoomService{
                 room.setStatus(RoomStatus.WAITING);
             }
 
-            roomRepository.save(room);
+            roomCacheRepository.save(room);
 
             roomEventPublisher.playerLeft(room.getId(), user.getId());
             return room;
@@ -164,7 +164,7 @@ public class RoomServiceImpl implements RoomService{
                 room.setStatus(RoomStatus.FULL);
             }
 
-            roomRepository.save(room);
+            roomCacheRepository.save(room);
 
             roomEventPublisher.playerJoined(room.getId(), user.getId());
             return room;
@@ -174,7 +174,7 @@ public class RoomServiceImpl implements RoomService{
     }
 
     public Room loadRoomOrThrow(UUID roomId){
-        return roomRepository.findById(roomId)
+        return roomCacheRepository.findById(roomId)
                 .orElseThrow(()->new EntityNotFoundException("Room from which user wanna leave do not exists"));
     }
 }

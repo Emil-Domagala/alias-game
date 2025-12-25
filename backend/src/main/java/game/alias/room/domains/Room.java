@@ -5,13 +5,14 @@ import java.util.Set;
 import java.util.UUID;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.redis.core.RedisHash;
 
 import game.alias.common.BaseRedisEntity;
 import org.springframework.data.redis.core.index.Indexed;
 
 
-@Builder
+@SuperBuilder
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,7 +25,10 @@ public class Room extends BaseRedisEntity {
     @Indexed
     private UUID ownerId;
 
+    @Builder.Default
     private Set<UUID> playersId = new HashSet<>();
+
+    @Builder.Default
     private RoomStatus status = RoomStatus.WAITING;
     private int maxPlayers;
     private int minPlayers;

@@ -2,13 +2,14 @@ package game.alias.common.message;
 
 import game.alias.common.BaseRedisEntity;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.redis.core.RedisHash;
 
 import java.util.UUID;
 
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @RedisHash("message")

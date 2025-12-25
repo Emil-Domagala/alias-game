@@ -9,7 +9,7 @@ import game.alias.room.domains.Room;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RoomRepository extends CrudRepository<Room, UUID> {
+public interface RoomCacheRepository extends CrudRepository<Room, UUID> {
 
     Optional<Room> findByOwnerId(UUID ownerId);
 }

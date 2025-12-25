@@ -7,9 +7,10 @@ import game.alias.room.domains.event.RoomCreatedEvent;
 import game.alias.room.domains.event.RoomDeletedEvent;
 import game.alias.room.domains.event.RoomPlayerJoinedEvent;
 import game.alias.room.domains.event.RoomPlayerLeftEvent;
-import game.alias.room.domains.event.dto.RoomCreatedEventDto;
+import game.alias.room.domains.event.dto.RoomChangedEventDto;
 import game.alias.room.domains.event.dto.RoomDeletedEventDto;
 import game.alias.room.domains.event.dto.RoomPlayerLeftEventDto;
+import game.alias.player.PlayerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -20,7 +21,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Slf4j
 public class RoomEventListenerImpl implements RoomEventListener{
-    private final RoomRepository roomRepository;
+    private final RoomCacheRepository roomCacheRepository;
+    private final PlayerService playerService;
     private final SimpMessagingTemplate template;
     private final RoomMapper roomMapper;
 
@@ -29,7 +31,8 @@ public class RoomEventListenerImpl implements RoomEventListener{
     @EventListener(RoomPlayerJoinedEvent.class)
     public void onPlayerJoined(RoomPlayerJoinedEvent event) {
         log.info("Player joined room. roomId={}, playerId={}", event.roomId(), event.userId());
-        var room = roomRepository.findById(event.roomId()).orElseThrow(()-> new RoomException("Room not found"));
+        var room = roomCacheRepository.findById(event.roomId()).orElseThrow(()-> new RoomException("Room not found"));
+
         template.convertAndSend(WebSocketDestinations.roomTopic(room.getId()),new RoomPlayerJoinedEvent(event.roomId(), event.userId()));
     }
 
@@ -37,17 +40,23 @@ public class RoomEventListenerImpl implements RoomEventListener{
     @EventListener(RoomPlayerLeftEvent.class)
     public void onPlayerLeft(RoomPlayerLeftEvent event) {
         log.info("Player left room. roomId={}, playerId={}", event.roomId(), event.userId());
-        var room = roomRepository.findById(event.roomId()).orElseThrow(()-> new RoomException("Room not found"));
-        var roomDto = roomMapper.toRoomDto(room);
+        var room = roomCacheRepository.findById(event.roomId()).orElseThrow(()-> new RoomException("Room not found"));
+        var owner = playerService.loadExistingPlayer(room.getOwnerId());
+        var roomDto = roomMapper.toRoomDto(room, owner);
+
         template.convertAndSend(WebSocketDestinations.roomTopic(room.getId()),new RoomPlayerLeftEventDto(roomDto));
+        template.convertAndSend(WebSocketDestinations.TOPIC_LOBBY,new RoomChangedEventDto(roomDto));
     }
 
     @Override
     @EventListener(RoomCreatedEvent.class)
     public void onRoomCreated(RoomCreatedEvent event) {
-        var room = roomRepository.findById(event.roomId()).orElseThrow(() -> new RoomException("Room not found"));
+        var room = roomCacheRepository.findById(event.roomId()).orElseThrow(() -> new RoomException("Room not found"));
         log.info("Room created. roomId={}, ownerId={}, maxPlayers={}, minPlayers={}", room.getId(), room.getOwnerId(), room.getMaxPlayers(), room.getMinPlayers());
-        template.convertAndSend(WebSocketDestinations.roomTopic(room.getId()),new RoomCreatedEventDto(room.getId()));
+        var owner = playerService.loadExistingPlayer(room.getOwnerId());
+        var roomDto = roomMapper.toRoomDto(room, owner);
+
+        template.convertAndSend(WebSocketDestinations.TOPIC_LOBBY,new RoomChangedEventDto(roomDto));
     }
 
     @Override
@@ -55,5 +64,6 @@ public class RoomEventListenerImpl implements RoomEventListener{
     public void onRoomDeleted(RoomDeletedEvent event) {
         log.info("Room deleted. roomId={}", event.roomId());
         template.convertAndSend(WebSocketDestinations.roomTopic(event.roomId()),new RoomDeletedEventDto(event.roomId()));
+        template.convertAndSend(WebSocketDestinations.TOPIC_LOBBY,new RoomDeletedEventDto(event.roomId()));
     }
 }

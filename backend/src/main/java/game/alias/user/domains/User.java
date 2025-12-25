@@ -38,7 +38,7 @@ import lombok.ToString;
 public class User extends BaseEntity {
 
     @Column(nullable = false)
-    private String username;
+    private String nick;
 
     @Column(nullable = false, unique = true)
     private String email;

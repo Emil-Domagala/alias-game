@@ -1,5 +1,6 @@
 package game.alias.auth.rest;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,6 +22,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @RestController
 @RequestMapping(ApiVersion.V1Public + "/auth")
 @RequiredArgsConstructor
@@ -32,11 +34,16 @@ public class AuthPublicController {
     @PostMapping("/register")
     public ResponseEntity<AuthUserDto> register(@RequestBody @Valid UserRegisterRequest userRegisterRequest,
             HttpServletResponse res) {
+        log.debug("Registering user {}", userRegisterRequest.email());
+
         AuthResponse authRes = authService.register(userRegisterRequest);
 
-        var sessionCookie = authCookieService.create(authRes.sessionId().toString());
+        var sessionCookie = authCookieService.create(authRes.sessionId());
 
         res.addHeader(HttpHeaders.SET_COOKIE, sessionCookie.toString());
+
+        log.debug("authRes: {}", authRes.toString());
+
 
         return ResponseEntity.ok(authRes.authUserDto());
     }

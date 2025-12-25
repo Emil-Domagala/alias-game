@@ -2,18 +2,22 @@ package game.alias.room.domains;
 
 import game.alias.room.domains.dto.RoomDto;
 import game.alias.room.domains.dto.RoomWithPlayersDto;
-import game.alias.user.domains.Player;
-import game.alias.user.domains.dto.PlayerDto;
+import game.alias.player.domains.Player;
+import game.alias.player.domains.PlayerMapper;
+import game.alias.player.domains.dto.PlayerDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Component
 public class RoomMapper {
+    private final PlayerMapper playerMapper;
 
-    public RoomDto toRoomDto(Room room) {
+    public RoomDto toRoomDto(Room room, Player owner) {
         if (room == null) {
             return null;
         }
@@ -21,7 +25,7 @@ public class RoomMapper {
         return new RoomDto(
                 room.getId(),
                 room.getName(),
-                room.getOwnerId(),
+                playerMapper.toPlayerDto(owner),
                 room.getMaxPlayers(),
                 room.getMinPlayers(),
                 room.getPlayersId() == null ? 0 : room.getPlayersId().size(),
@@ -29,7 +33,7 @@ public class RoomMapper {
         );
     }
 
-    public RoomWithPlayersDto toRoomWithPlayersDto(Room room, Set<Player> players) {
+    public RoomWithPlayersDto toRoomWithPlayersDto(Room room, Set<Player> players, Player owner) {
         if (room == null) {
             return null;
         }
@@ -37,7 +41,7 @@ public class RoomMapper {
         return new RoomWithPlayersDto(
                 room.getId(),
                 room.getName(),
-                room.getOwnerId(),
+                playerMapper.toPlayerDto(owner),
                 room.getMaxPlayers(),
                 room.getMinPlayers(),
                 mapPlayers(players),
@@ -51,15 +55,9 @@ public class RoomMapper {
         }
 
         return players.stream()
-                .map(this::toPlayerDto)
+                .map(playerMapper::toPlayerDto)
                 .collect(Collectors.toSet());
     }
 
-    private PlayerDto toPlayerDto(Player player) {
-        if (player == null) {
-            return null;
-        }
 
-        return new PlayerDto(player.getId(), player.getUsername());
-    }
 }

@@ -1,7 +1,10 @@
 package game.alias.auth.rest.services;
 
+import java.util.Set;
 import java.util.UUID;
 
+import game.alias.auth.domains.UserRole;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +22,7 @@ import game.alias.user.domains.User;
 import game.alias.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -31,14 +35,16 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse register(@NonNull UserRegisterRequest request) {
+        log.debug("UserRegisterRequest {}", request);
         if (userRepository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("Email already taken");
         }
 
         User user = User.builder()
                 .email(request.email())
-                .username(request.username())
+                .nick(request.nick())
                 .password(passwordEncoder.encode(request.password()))
+                .roles(Set.of(UserRole.USER))
                 .build();
 
         if (user == null) {
@@ -47,7 +53,11 @@ public class AuthServiceImpl implements AuthService {
 
         var sUser = userRepository.save(user);
 
-        AuthUser authUser = new AuthUser(sUser.getId(), sUser.getEmail(), sUser.getPassword(), sUser.getRoles());
+        log.debug("sUser {}", sUser);
+
+        AuthUser authUser = new AuthUser(sUser.getId(), sUser.getEmail(),sUser.getNick(), sUser.getPassword(), sUser.getRoles());
+
+        log.debug("authUser {}", authUser);
 
         var sessionId = createSessionTokenAndSaveUserToRedis(authUser);
 
