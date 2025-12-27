@@ -13,6 +13,7 @@ public record RoomWithPlayersDto(
         int maxPlayers,
         int minPlayers,
         Set<PlayerDto> players,
-        RoomStatus status
+        RoomStatus status,
+        int numberOfTeams
 ) {
 }

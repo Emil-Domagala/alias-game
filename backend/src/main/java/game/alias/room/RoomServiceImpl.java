@@ -39,6 +39,10 @@ public class RoomServiceImpl implements RoomService{
                 throw new RoomException("You already own room with ID: " + existingRoom.get().getId());
             }
 
+            if (request.numberOfTeams() / request.minPlayers() < 2){
+                throw new RoomException("Team must have at least 2 people, increase min players number or decrese number of teams");
+            }
+
             Set<UUID> players = new HashSet<>();
             Room roomToSave = Room.builder()
                     .name(request.name())
@@ -46,7 +50,7 @@ public class RoomServiceImpl implements RoomService{
                     .maxPlayers(request.maxPlayers())
                     .minPlayers(request.minPlayers())
                     .playersId(players)
-                    .ttl(Duration.ofHours(1))
+                    .ttl(Duration.ofHours(1).getSeconds())
                     .build();
            var savedRoom =  roomCacheRepository.save(roomToSave);
 

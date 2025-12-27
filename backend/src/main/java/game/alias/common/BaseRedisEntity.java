@@ -24,7 +24,4 @@ public class BaseRedisEntity {
 
     @Builder.Default
     protected Instant createdAt = Instant.now();
-
-    @TimeToLive
-    protected Duration ttl;
 }

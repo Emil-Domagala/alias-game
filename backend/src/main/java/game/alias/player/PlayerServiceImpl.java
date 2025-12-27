@@ -12,8 +12,6 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +41,7 @@ public class PlayerServiceImpl implements PlayerService {
                                 .build()
                 ));
 
-        result.values().forEach(p -> p.setTtl(Duration.ofHours(1)));
+        result.values().forEach(p -> p.setTtl(Duration.ofHours(1).getSeconds()));
 
         playerCacheRepository.saveAll(result.values());
 
@@ -56,7 +54,7 @@ public class PlayerServiceImpl implements PlayerService {
 
         return playerCacheRepository.findById(userId)
                 .map(player -> {
-                    player.setTtl(Duration.ofHours(1));
+                    player.setTtl(Duration.ofHours(1).getSeconds());
                     return playerCacheRepository.save(player);
                 })
                 .orElseGet(() -> {
@@ -68,7 +66,7 @@ public class PlayerServiceImpl implements PlayerService {
                     Player player = Player.builder()
                             .id(user.getId())
                             .nick(user.getNick())
-                            .ttl(Duration.ofHours(1))
+                            .ttl(Duration.ofHours(1).getSeconds())
                             .build();
 
                     return playerCacheRepository.save(player);
@@ -77,6 +75,19 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public Player cashePlayer(AuthUser user) {
-        return null;
+        var foundPlayer = playerCacheRepository.findById(user.getId());
+        Player player;
+
+        if (foundPlayer.isPresent()) {
+            player = foundPlayer.get();
+            player.setTtl(Duration.ofHours(1).getSeconds());
+        } else {
+            player = Player.builder()
+                    .id(user.getId())
+                    .nick(user.getNick())
+                    .ttl(Duration.ofHours(1).getSeconds())
+                    .build();
+        }
+       return playerCacheRepository.save(player);
     }
 }

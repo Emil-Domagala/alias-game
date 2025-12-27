@@ -29,7 +29,8 @@ public class RoomMapper {
                 room.getMaxPlayers(),
                 room.getMinPlayers(),
                 room.getPlayersId() == null ? 0 : room.getPlayersId().size(),
-                room.getStatus()
+                room.getStatus(),
+                room.getNumberOfTeams()
         );
     }
 
@@ -45,7 +46,8 @@ public class RoomMapper {
                 room.getMaxPlayers(),
                 room.getMinPlayers(),
                 mapPlayers(players),
-                room.getStatus()
+                room.getStatus(),
+                room.getNumberOfTeams()
         );
     }
 
