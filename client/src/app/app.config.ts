@@ -2,11 +2,13 @@ import {ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessCh
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
+import { provideStore } from '@ngrx/store';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes)
-  ]
+    provideRouter(routes),
+    provideStore()
+]
 };

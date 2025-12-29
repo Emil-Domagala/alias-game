@@ -1,10 +1,13 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {WebSocketService} from '../web-socket.service';
 import {StompSubscription} from '@stomp/stompjs';
+import {CreateRoomModal} from '../room/create-room-modal/create-room-modal';
 
 @Component({
   selector: 'app-lobby',
-  imports: [],
+  imports: [
+    CreateRoomModal
+  ],
   templateUrl: './lobby.component.html',
   styleUrl: './lobby.component.scss'
 })
