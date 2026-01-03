@@ -1,0 +1,38 @@
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+
+  &__label {
+    font-size: var(--font-sm);
+    color: var(--text-secondary);
+  }
+
+  &__control ::ng-deep {
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-default);
+      background: var(--background-surface);
+      color: var(--text-primary);
+      font-size: var(--font-sm);
+
+      &:focus {
+        outline: none;
+        border-color: var(--border-focus);
+      }
+    }
+  }
+  &__error {
+    font-size: var(--font-xs);
+    color: var(--color-error);
+  }
+  &__hint {
+    font-size: var(--font-xs);
+    color: var(--text-muted);
+  }
+}
+

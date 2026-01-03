@@ -1,37 +1,55 @@
+<h1>Register</h1>
+
 <form (submit)="submit($event)">
+  <app-form-field
+    label="Email"
+    forId="email"
+    [error]="registerForm.email().errors()[0]"
+    [touched]="registerForm.email().touched"
+    [valid]="registerForm.email().valid"
+  >
+    <input
+      id="email"
+      type="email"
+      [field]="registerForm.email"
+      placeholder="you@example.com"
+    />
+  </app-form-field>
 
-  <input
-    type="email"
-    [field]="registerForm.email"
-  />
+  <app-form-field
+    label="Username"
+    forId="nick"
+    [error]="registerForm.nick().errors()[0]"
+    [touched]="registerForm.nick().touched"
+    [valid]="registerForm.nick().valid"
+  >
+    <input
+      id="nick"
+      type="text"
+      [field]="registerForm.nick"
+      placeholder="your username"
+    />
+  </app-form-field>
 
-  @if (registerForm.email().touched() &&
-  !registerForm.email().valid()) {
-    <p>Invalid email</p>
-  }
+  <app-form-field
+    label="Password"
+    forId="password"
+    [error]="registerForm.password().errors()[0]"
+    [touched]="registerForm.password().touched"
+    [valid]="registerForm.password().valid"
+  >
+    <input
+      id="password"
+      type="password"
+      [field]="registerForm.password"
+    />
+  </app-form-field>
 
-  <input
-    type="text"
-    [field]="registerForm.nick"
-  />
-
-  @if (registerForm.nick().touched() &&
-  !registerForm.nick().valid()) {
-    <p>Invalid username</p>
-  }
-
-  <input
-    type="password"
-    [field]="registerForm.password"
-  />
-
-  @if (registerForm.password().touched() &&
-  !registerForm.password().valid()) {
-    <p>Invalid password</p>
-  }
-
-  <button type="submit" [disabled]="registerForm().invalid()">
+  <button
+    type="submit"
+    [disabled]="registerForm().invalid()"
+    class="btn btn-primary"
+  >
     Register
   </button>
-
 </form>

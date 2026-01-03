@@ -4,10 +4,11 @@ import {UserRegisterRequestInterface} from './UserRegisterRequest.interface';
 import {USER_CONSTRAINTS} from '../user.constraints';
 import {RegisterService} from './register.service';
 import {CommonModule} from '@angular/common';
+import {FormField} from '../../shared/form/form-field/form-field';
 
 @Component({
   selector: 'app-register',
-  imports: [Field, CommonModule],
+  imports: [Field, CommonModule, FormField],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
 })

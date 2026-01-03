@@ -1,27 +1,36 @@
+<h1>Login</h1>
+
 <form (submit)="submit($event)">
+  <app-form-field
+    label="Email"
+    forId="email"
+    [error]="loginForm.email().errors()[0]"
+    [touched]="loginForm.email().touched"
+    [valid]="loginForm.email().valid"
+  >
+    <input
+      id="email"
+      type="email"
+      [field]="loginForm.email"
+      placeholder="you@example.com"
+    />
+  </app-form-field>
 
-  <input
-    type="email"
-    [field]="loginForm.email"
-  />
+  <app-form-field
+    label="Password"
+    forId="password"
+    [error]="loginForm.password().errors()[0]"
+    [touched]="loginForm.password().touched"
+    [valid]="loginForm.password().valid"
+  >
+    <input
+      id="password"
+      type="password"
+      [field]="loginForm.password"
+    />
+  </app-form-field>
 
-  @if (loginForm.email().touched() &&
-  !loginForm.email().valid()) {
-    <p>Invalid email</p>
-  }
-
-
-  <input
-    type="password"
-    [field]="loginForm.password"
-  />
-
-  @if (loginForm.password().touched() &&
-  !loginForm.password().valid()) {
-    <p>Invalid password</p>
-  }
-
-  <button type="submit" [disabled]="loginForm().invalid()">
+  <button type="submit" [disabled]="loginForm().invalid()" class="btn btn-primary">
     Register
   </button>
 

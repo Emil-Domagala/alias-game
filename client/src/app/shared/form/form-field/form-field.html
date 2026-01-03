@@ -1,0 +1,21 @@
+<div class="form-field">
+  <label class="form-field__label" [attr.for]="forId()">
+    {{ label() }}
+  </label>
+
+  <div class="form-field__control">
+    <ng-content></ng-content>
+  </div>
+
+  @if (hint()) {
+    <div class="form-field__hint">
+      {{ hint() }}
+    </div>
+  }
+
+  @if (touched()() && !valid()()) {
+    <div class="form-field__error">
+      {{ error().message }}
+    </div>
+  }
+</div>

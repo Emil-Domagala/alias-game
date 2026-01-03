@@ -1,1 +1,206 @@
-/* You can add global styles to this file, and also import other style files */
+@use './_colors.scss' as *;
+@use "./_variables.scss" as *;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+html {
+  font-size: 62.5%;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: 'Open Sans', sans-serif;
+  font-smooth: auto;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-size: var(--font-md);
+  line-height: 1.5;
+}
+
+button{
+  cursor: pointer;
+}
+
+button:disabled{
+  cursor: not-allowed;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  font-size: var(--font-md);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    opacity var(--transition-fast);
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--color-primary-soft);
+  }
+  &:disabled,
+  &.is-disabled {
+    opacity: 0.6;
+  }
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--text-inverse);
+
+  &:not(:disabled):not(.is-disabled):hover {
+    background-color: var(--color-primary-hover);
+  }
+
+  &:not(:disabled):not(.is-disabled):active {
+    background-color: var(--color-primary-active);
+  }
+}
+
+.btn-secondary {
+  background-color: var(--background-surface-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-default);
+
+  &:not(:disabled):not(.is-disabled):hover {
+    background-color: var(--background-surface);
+  }
+
+  &:not(:disabled):not(.is-disabled):active {
+    background-color: var(--background);
+  }
+}
+
+.btn-danger {
+  background-color: var(--color-error);
+  color: var(--always-white);
+
+  &:not(:disabled):not(.is-disabled):hover {
+    background-color: var(--color-error-hover);
+  }
+
+  &:not(:disabled):not(.is-disabled):active {
+    background-color: var(--color-error-active);
+  }
+}
+
+.btn-warning {
+  background-color: var(--color-warning);
+  color: var(--always-black);
+
+  &:not(:disabled):not(.is-disabled):hover {
+    background-color: var(--color-warning-hover);
+  }
+
+  &:not(:disabled):not(.is-disabled):active {
+    background-color: var(--color-warning-active);
+  }
+}
+
+.btn[class*='btn-outline-'] {
+  background-color: transparent;
+}
+
+.btn-outline-primary {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+
+  &:not(:disabled):not(.is-disabled):hover {
+    background-color: var(--color-primary-soft);
+  }
+
+  &:not(:disabled):not(.is-disabled):active {
+    background-color: var(--color-primary-soft);
+  }
+}
+
+.btn-outline-secondary {
+  color: var(--text-secondary);
+  border-color: var(--border-default);
+
+  &:not(:disabled):not(.is-disabled):hover {
+    background-color: var(--background-surface-secondary);
+  }
+
+  &:not(:disabled):not(.is-disabled):active {
+    background-color: var(--background-surface);
+  }
+}
+
+.btn-outline-danger {
+  color: var(--color-error);
+  border-color: var(--color-error);
+
+  &:not(:disabled):not(.is-disabled):hover {
+    background-color: var(--color-error-soft);
+  }
+
+  &:not(:disabled):not(.is-disabled):active {
+    background-color: var(--color-error-soft);
+  }
+}
+
+.btn-outline-warning {
+  color: var(--color-warning);
+  border-color: var(--color-warning);
+
+  &:not(:disabled):not(.is-disabled):hover {
+    background-color: var(--color-warning-soft);
+  }
+
+  &:not(:disabled):not(.is-disabled):active {
+    background-color: var(--color-warning-soft);
+  }
+}
+
+.container {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: var(--space-md);
+}
+
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+    padding-inline: var(--space-lg);
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}

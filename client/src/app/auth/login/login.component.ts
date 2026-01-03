@@ -3,10 +3,11 @@ import {LoginService} from './login.service';
 import {UserLoginRequest} from './UserLoginRequest.interface';
 import {email, Field, form, maxLength, minLength, required} from '@angular/forms/signals';
 import {USER_CONSTRAINTS} from '../user.constraints';
+import {FormField} from '../../shared/form/form-field/form-field';
 
 @Component({
   selector: 'app-login',
-  imports: [Field],
+  imports: [Field, FormField],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
