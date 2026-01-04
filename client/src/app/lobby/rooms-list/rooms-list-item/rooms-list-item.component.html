@@ -1,0 +1,26 @@
+<div class="room-list-item">
+  <div class="room-list-item__main">
+    <div class="room-list-item__identity">
+      <span class="status-dot" [class]="'status-dot--' + room().roomStatus.toLowerCase()"></span>
+      <div class="room-list-item__text">
+        <h3 class="room-list-item__name">{{ room().name }}</h3>
+        <span class="room-list-item__owner">by {{ room().owner.nick }}</span>
+      </div>
+    </div>
+
+    <div class="room-list-item__stats">
+      <div class="player-count">
+        <span class="count-now">{{ room().playersCount }}</span>
+        <span class="count-max">/{{ room().maxPlayers }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="room-list-item__actions">
+    <button class="btn btn-primary room-list-item__join-btn"
+            [disabled]="room().playersCount >= room().maxPlayers"
+            (click)="join()">
+      Join
+    </button>
+  </div>
+</div>

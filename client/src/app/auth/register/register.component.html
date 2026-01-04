@@ -4,9 +4,7 @@
   <app-form-field
     label="Email"
     forId="email"
-    [error]="registerForm.email().errors()[0]"
-    [touched]="registerForm.email().touched"
-    [valid]="registerForm.email().valid"
+    [field]="registerForm.email"
   >
     <input
       id="email"
@@ -19,9 +17,7 @@
   <app-form-field
     label="Username"
     forId="nick"
-    [error]="registerForm.nick().errors()[0]"
-    [touched]="registerForm.nick().touched"
-    [valid]="registerForm.nick().valid"
+    [field]="registerForm.nick"
   >
     <input
       id="nick"
@@ -34,9 +30,7 @@
   <app-form-field
     label="Password"
     forId="password"
-    [error]="registerForm.password().errors()[0]"
-    [touched]="registerForm.password().touched"
-    [valid]="registerForm.password().valid"
+    [field]="registerForm.password"
   >
     <input
       id="password"
@@ -52,4 +46,10 @@
   >
     Register
   </button>
+
+  <p class="auth-switch">
+    Already have an account?
+    <a [routerLink]="['/','auth','login']" class="auth-switch__link">Login here</a>.
+  </p>
+
 </form>

@@ -38,9 +38,6 @@ export class RoomComponent implements OnInit, OnDestroy {
       console.log('Room event:', msg);
       this.roomEvents.push(msg);
     });
-
-    // Optionally, send join request via REST or WS command
-    this.joinRoom();
   }
 
   joinRoom() {
@@ -56,7 +53,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.leaveRoom(); // clean up
+    this.leaveRoom();
     this.wsSub?.unsubscribe();
     this.ws.disconnect();
   }

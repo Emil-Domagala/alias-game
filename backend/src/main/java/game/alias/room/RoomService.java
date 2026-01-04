@@ -1,6 +1,8 @@
 package game.alias.room;
 
 import game.alias.auth.AuthUser;
+import game.alias.common.pagination.PaginationRequest;
+import game.alias.common.pagination.PaginationResult;
 import game.alias.room.domains.Room;
 import game.alias.room.domains.request.CreateRoomRequest;
 
@@ -17,4 +19,6 @@ public interface RoomService {
     Room joinRoom(UUID roomId, AuthUser user);
 
     Room loadRoomOrThrow(UUID roomId);
+
+    PaginationResult<Room> getRooms(PaginationRequest request);
 }

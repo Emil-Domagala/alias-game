@@ -22,7 +22,7 @@ public record CreateRoomRequest(
         @Size(min = 3, max = 30, message = "Name must be between 3 and 30 characters")
         String name,
 
-        @NotBlank
+        @NotNull
         @Min(value = 1, message = "Number of teams must be at least 1")
         @Max(value = 5, message = "Number of tems cannot exceed 5")
         Integer numberOfTeams

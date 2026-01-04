@@ -1,21 +1,22 @@
-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import { Component, inject, signal} from '@angular/core';
 import {form, Field, required, email, minLength, maxLength} from '@angular/forms/signals';
-import {UserRegisterRequestInterface} from './UserRegisterRequest.interface';
+import {UserRegisterRequest} from './UserRegisterRequest.interface';
 import {USER_CONSTRAINTS} from '../user.constraints';
-import {RegisterService} from './register.service';
 import {CommonModule} from '@angular/common';
-import {FormField} from '../../shared/form/form-field/form-field';
+import {FormFieldComponent} from '../../shared/form/form-field/form-field.component';
+import {RouterLink} from '@angular/router';
+import {AuthService} from '../auth.service';
 
 @Component({
   selector: 'app-register',
-  imports: [Field, CommonModule, FormField],
+  imports: [Field, CommonModule, FormFieldComponent, RouterLink],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
 })
 export class RegisterComponent {
-  registerService = inject(RegisterService);
+  authService = inject(AuthService);
 
-  registerModel = signal<UserRegisterRequestInterface>({
+  registerModel = signal<UserRegisterRequest>({
     email: '',
     nick: '',
     password: '',
@@ -36,7 +37,7 @@ export class RegisterComponent {
     event.preventDefault();
     if (this.registerForm().invalid()) return;
 
-    this.registerService
+    this.authService
       .register(this.registerForm().value())
       .subscribe({
         next: (data) => {

@@ -1,0 +1,9 @@
+@if (rooms().length > 0){
+  <ul>
+    @for(room of rooms(); track room.id){
+      <li>
+        <app-rooms-list-item [room]="room"/>
+      </li>
+    }
+  </ul>
+}

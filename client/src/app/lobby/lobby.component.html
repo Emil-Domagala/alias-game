@@ -1,2 +1,8 @@
-<p>lobby works!</p>
-<app-create-room-modal/>
+<div class="container">
+  <h1>Lobby</h1>
+  <button (click)="openCreateRoomModal()" >Create Room</button>
+  <app-rooms-list [rooms]="rooms()" />
+</div>
+
+
+

@@ -10,14 +10,22 @@ import {
 } from '@angular/forms/signals';
 import {RoomService} from '../room.service';
 import {CreateRoomRequest} from './CreateRoomRequest.interface';
+import {FormFieldComponent} from '../../shared/form/form-field/form-field.component';
+import {DIALOG_DATA, DialogRef} from '@angular/cdk/dialog';
 
 @Component({
   selector: 'app-create-room-modal',
-  imports: [Field],
-  templateUrl: './create-room-modal.html',
-  styleUrl: './create-room-modal.scss',
+  imports: [Field, FormFieldComponent],
+  templateUrl: './create-room-modal.component.html',
+  styleUrl: './create-room-modal.component.scss',
 })
-export class CreateRoomModal {
+export class CreateRoomModalComponent {
+  private dialogRef = inject(DialogRef);
+  data = inject(DIALOG_DATA);
+
+  close(result?: any) {
+    this.dialogRef.close(result);
+  }
 
   service = inject(RoomService);
 

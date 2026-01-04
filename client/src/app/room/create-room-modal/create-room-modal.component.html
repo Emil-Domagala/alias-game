@@ -1,0 +1,62 @@
+<h1>Create room</h1>
+
+<form (submit)="submit()">
+  <app-form-field
+    label="Room name"
+    forId="name"
+    [field]="createRoom.name"
+  >
+    <input
+      id="name"
+      type="text"
+      [field]="createRoom.name"
+      placeholder="Room name"
+    />
+  </app-form-field>
+
+  <app-form-field
+    label="Minimum players"
+    forId="minPlayers"
+    [field]="createRoom.minPlayers"
+  >
+    <input
+      id="minPlayers"
+      type="number"
+      [field]="createRoom.minPlayers"
+    />
+  </app-form-field>
+
+  <app-form-field
+    label="Maximum players"
+    forId="maxPlayers"
+    [field]="createRoom.maxPlayers"
+  >
+    <input
+      id="maxPlayers"
+      type="number"
+      [field]="createRoom.maxPlayers"
+    />
+  </app-form-field>
+
+  <app-form-field
+    label="Number of teams"
+    forId="numberOfTeams"
+    [field]="createRoom.numberOfTeams"
+  >
+    <input
+      id="numberOfTeams"
+      type="number"
+      [field]="createRoom.numberOfTeams"
+    />
+  </app-form-field>
+
+  <button
+    type="submit"
+    [disabled]="createRoom().invalid()"
+    class="btn btn-primary"
+  >
+    Create room
+  </button>
+</form>
+
+<button (click)="close()">Close</button>

@@ -1,20 +1,22 @@
 package game.alias.room;
 
 import game.alias.auth.AuthUser;
+import game.alias.common.pagination.PaginationRequest;
+import game.alias.common.pagination.PaginationResult;
 import game.alias.room.domains.Room;
 import game.alias.room.domains.RoomException;
 import game.alias.room.domains.RoomStatus;
 import game.alias.room.domains.request.CreateRoomRequest;
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.time.Duration;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +24,11 @@ public class RoomServiceImpl implements RoomService{
     private final RoomCacheRepository roomCacheRepository;
     private final StringRedisTemplate redisTemplate;
     private final RoomEventPublisher roomEventPublisher;
+
+    @PostConstruct
+    void check() {
+        Assert.notNull(redisTemplate, "StringRedisTemplate is NOT injected");
+    }
 
     @Override
     public Room create(CreateRoomRequest request, AuthUser user) {
@@ -39,11 +46,15 @@ public class RoomServiceImpl implements RoomService{
                 throw new RoomException("You already own room with ID: " + existingRoom.get().getId());
             }
 
-            if (request.numberOfTeams() / request.minPlayers() < 2){
+            int playersPerTeam = request.maxPlayers() / request.numberOfTeams();
+
+            if (playersPerTeam < 2){
                 throw new RoomException("Team must have at least 2 people, increase min players number or decrese number of teams");
             }
 
             Set<UUID> players = new HashSet<>();
+            players.add(user.getId());
+
             Room roomToSave = Room.builder()
                     .name(request.name())
                     .ownerId(user.getId())
@@ -58,7 +69,9 @@ public class RoomServiceImpl implements RoomService{
 
            return  savedRoom;
         }finally {
-            redisTemplate.delete(lockKey);
+            if (Boolean.TRUE.equals(lockAcquired)) {
+                redisTemplate.delete(lockKey);
+            }
         }
     }
 
@@ -181,4 +194,22 @@ public class RoomServiceImpl implements RoomService{
         return roomCacheRepository.findById(roomId)
                 .orElseThrow(()->new EntityNotFoundException("Room from which user wanna leave do not exists"));
     }
+
+    @Override
+    public PaginationResult<Room> getRooms(PaginationRequest request) {
+        List<Room> rooms = StreamSupport
+                .stream(roomCacheRepository.findAll().spliterator(), false)
+                .toList();
+
+        return new PaginationResult<>(
+                rooms,
+                0,
+                rooms.size(),
+                request.getSize(),
+                request.getPage(),
+                rooms.isEmpty()
+        );
+
+    }
+
 }

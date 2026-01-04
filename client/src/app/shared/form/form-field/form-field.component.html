@@ -13,9 +13,9 @@
     </div>
   }
 
-  @if (touched()() && !valid()()) {
+  @if (touched && !valid) {
     <div class="form-field__error">
-      {{ error().message }}
+      {{ errorMessage }}
     </div>
   }
 </div>

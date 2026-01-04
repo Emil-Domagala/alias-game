@@ -1,0 +1,36 @@
+:host{
+  width: 100%;
+}
+
+h1{
+  text-align: center;
+  margin-bottom: var(--space-md);
+}
+
+form{
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+button{
+  margin-top: var(--space-lg);
+}
+
+.auth-switch {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  text-align: center;
+
+  &__link {
+    color: var(--color-primary);
+    text-decoration: underline;
+    &:hover {
+      color: var(--color-primary-hover);
+    }
+
+    &:active {
+      color: var(--color-primary-active);
+    }
+  }
+}

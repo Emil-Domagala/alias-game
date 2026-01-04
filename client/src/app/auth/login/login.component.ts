@@ -1,18 +1,19 @@
 import {Component, inject, signal} from '@angular/core';
-import {LoginService} from './login.service';
 import {UserLoginRequest} from './UserLoginRequest.interface';
 import {email, Field, form, maxLength, minLength, required} from '@angular/forms/signals';
 import {USER_CONSTRAINTS} from '../user.constraints';
-import {FormField} from '../../shared/form/form-field/form-field';
+import {FormFieldComponent} from '../../shared/form/form-field/form-field.component';
+import {RouterLink} from '@angular/router';
+import {AuthService} from '../auth.service';
 
 @Component({
   selector: 'app-login',
-  imports: [Field, FormField],
+  imports: [Field, FormFieldComponent, RouterLink],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
-  loginService = inject(LoginService);
+  authService = inject(AuthService);
 
   loginModel= signal<UserLoginRequest>({
     email:'',
@@ -31,8 +32,8 @@ export class LoginComponent {
     event.preventDefault();
     if (this.loginForm().invalid()) return;
 
-    this.loginService
-      .register(this.loginForm().value())
+    this.authService
+      .login(this.loginForm().value())
       .subscribe({
         next: (data) => {
           console.log(data)
