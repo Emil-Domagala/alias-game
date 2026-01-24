@@ -28,7 +28,7 @@ public class Room extends BaseRedisEntity {
     private UUID ownerId;
 
     @Builder.Default
-    private Set<UUID> playersId = new HashSet<>(ownerId);
+    private Set<UUID> playersId = new HashSet<>();
 
     @Builder.Default
     private RoomStatus status = RoomStatus.WAITING;
