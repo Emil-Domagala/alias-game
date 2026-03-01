@@ -1,4 +1,4 @@
-package game.alias.room.domains.event.dto;
+package game.alias.room.event.dto;
 
 import java.util.UUID;
 

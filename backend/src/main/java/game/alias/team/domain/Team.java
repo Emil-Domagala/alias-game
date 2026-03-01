@@ -17,10 +17,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @RedisHash("team")
 public class Team extends BaseRedisEntity {
+    private String name;
+    private UUID ownerId;
     private Set<UUID> playersId;
-
-    @Indexed
     private UUID roomId;
-    private int won;
+    private TeamScore score;
     private int requiredMinPlayers;
 }

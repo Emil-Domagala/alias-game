@@ -1,10 +1,10 @@
 package game.alias.room;
 
 import game.alias.room.domains.Room;
-import game.alias.room.domains.event.RoomCreatedEvent;
-import game.alias.room.domains.event.RoomDeletedEvent;
-import game.alias.room.domains.event.RoomPlayerJoinedEvent;
-import game.alias.room.domains.event.RoomPlayerLeftEvent;
+import game.alias.room.event.RoomCreatedEvent;
+import game.alias.room.event.RoomDeletedEvent;
+import game.alias.room.event.RoomPlayerJoinedEvent;
+import game.alias.room.event.RoomPlayerLeftEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;

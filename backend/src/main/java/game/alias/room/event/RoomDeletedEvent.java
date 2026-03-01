@@ -1,4 +1,4 @@
-package game.alias.room.domains.event;
+package game.alias.room.event;
 
 import java.util.UUID;
 

@@ -1,6 +1,6 @@
 package game.alias.team;
 
-import game.alias.room.domains.event.RoomDeletedEvent;
+import game.alias.room.event.RoomDeletedEvent;
 
 public interface TeamListener {
 

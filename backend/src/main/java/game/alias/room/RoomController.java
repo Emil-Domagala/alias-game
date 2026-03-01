@@ -43,8 +43,8 @@ public class RoomController {
         return ResponseEntity.created(location).body(roomDto);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void>deleteRoom(@PathVariable UUID id, @AuthenticationPrincipal AuthUser user){
+    @DeleteMapping("/{roomId}")
+    public ResponseEntity<Void>deleteRoom(@PathVariable UUID roomId, @AuthenticationPrincipal AuthUser user){
         return null;
     }
 
