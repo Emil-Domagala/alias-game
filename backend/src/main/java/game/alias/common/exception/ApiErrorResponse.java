@@ -1,5 +1,6 @@
 package game.alias.common.exception;
 
+import java.time.Instant;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -16,7 +17,6 @@ public class ApiErrorResponse {
     private int status;
     private String message;
     private List<FieldError> errors;
-    private String path;
 
     @Data
     @Builder

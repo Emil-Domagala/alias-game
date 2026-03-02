@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import javax.crypto.SecretKey;
 
+import game.alias.auth.session.exceptions.AuthException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +43,7 @@ public class JwtService {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String validateAndGetSessionId(String token) {
+    public String validateAndGetSessionId(String token) throws AuthException {
         log.info("Token: " + token);
 
         try {
@@ -52,13 +53,13 @@ public class JwtService {
                     .getPayload().getSubject();
         } catch (ExpiredJwtException e) {
             log.error("ExpiredJwtException", e);
-            return null;
+            throw new AuthException("Token expired", e);
         } catch (JwtException e) {
             log.error("JwtException", e);
-            return null;
-        } catch (IllegalArgumentException e) {
-            log.error("IllegalArgumentException", e);
-            return null;
+            throw new AuthException("Token expired", e);
+        } catch (Exception e) {
+            log.error("Exception", e);
+            throw new AuthException("Token expired", e);
         }
     }
 

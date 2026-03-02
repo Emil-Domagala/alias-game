@@ -5,7 +5,7 @@ import java.util.Set;
 
 import game.alias.auth.domains.UserRole;
 import game.alias.common.BaseEntity;
-import game.alias.user.score.UserScore;
+import game.alias.user.score.domains.UserScore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;

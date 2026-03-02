@@ -1,8 +1,12 @@
+:host{
+  display: flex;
+  flex: 1;
+}
+
 .container{
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100dvh;
 }
 
 .auth-card{

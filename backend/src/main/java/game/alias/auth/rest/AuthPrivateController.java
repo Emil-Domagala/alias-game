@@ -33,9 +33,4 @@ public class AuthPrivateController {
         return ResponseEntity.noContent().header(HttpHeaders.SET_COOKIE, authCookieService.clear().toString()).build();
 
     }
-
-    @GetMapping("/me")
-    public AuthUser me(@AuthenticationPrincipal AuthUser user) {
-        return user;
-    }
 }

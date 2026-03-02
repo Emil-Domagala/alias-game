@@ -1,0 +1,31 @@
+.footer {
+  background: var(--background-surface);
+  border-top: 1px solid var(--divider);
+  padding-block: var(--space-xl);
+}
+
+.footer__inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-xl);
+  flex-wrap: wrap;
+}
+
+.footer__logo {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-xs);
+}
+
+.footer__copyright {
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+}
+
+.footer__links {
+  display: flex;
+  gap: var(--space-lg);
+  flex-wrap: wrap;
+}

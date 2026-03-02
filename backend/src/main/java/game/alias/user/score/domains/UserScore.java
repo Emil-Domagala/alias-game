@@ -1,4 +1,4 @@
-package game.alias.user.score;
+package game.alias.user.score.domains;
 
 import game.alias.common.BaseEntity;
 import jakarta.persistence.Column;

@@ -26,12 +26,12 @@ public class RedisAuthUserService {
 
     private static final String SESSION_BASE_KEY = "session:user:";
 
-    public AuthUser getUserFromSessionAndExtend(@NonNull String sessionId) {
+    public AuthUser getUserFromSessionAndExtend(@NonNull String sessionId) throws RedisSessionException {
         final String key = SESSION_BASE_KEY + sessionId;
 
         String jsonUser = redis.opsForValue().getAndExpire(key, USER_TTL);
         if (jsonUser == null) {
-            return null;
+            throw new RedisSessionException("No user found for session " + sessionId);
         }
 
         try {

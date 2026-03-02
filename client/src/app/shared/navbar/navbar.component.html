@@ -1,0 +1,25 @@
+<nav class="navbar">
+  <div class="container navbar__inner">
+    <div class="navbar__logo" routerLink="/lobby">
+      ALIAS GAME
+    </div>
+
+    <div class="navbar__actions">
+      <a
+        [routerLink]="['/','auth','login']"
+        routerLinkActive="is-active"
+        class="btn btn-outline-secondary"
+      >
+        Login
+      </a>
+
+      <a
+        [routerLink]="['/','auth','register']"
+        routerLinkActive="is-active"
+        class="btn btn-primary"
+      >
+        Register
+      </a>
+    </div>
+  </div>
+</nav>
