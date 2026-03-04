@@ -4,6 +4,9 @@ import java.util.Set;
 import java.util.UUID;
 
 import game.alias.auth.domains.UserRole;
+import game.alias.user.UserService;
+import game.alias.user.domains.UserMapper;
+import game.alias.user.domains.dto.UserDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,6 +35,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final RedisAuthUserService redisAuthService;
     private final AuthUserMapper authUserMapper;
+    private final UserService userService;
 
     @Override
     public AuthResponse register(@NonNull UserRegisterRequest request) {
@@ -61,7 +65,9 @@ public class AuthServiceImpl implements AuthService {
 
         var sessionId = createSessionTokenAndSaveUserToRedis(authUser);
 
-        return new AuthResponse(sessionId, authUserMapper.toAuthUserDto(authUser));
+        UserDto userDto = UserMapper.toDto(sUser);
+
+        return new AuthResponse(sessionId, userDto);
     }
 
     @Override
@@ -73,7 +79,9 @@ public class AuthServiceImpl implements AuthService {
 
         var sessionId = createSessionTokenAndSaveUserToRedis((AuthUser) auth.getPrincipal());
 
-        return new AuthResponse(sessionId, authUserMapper.toAuthUserDto((AuthUser) auth.getPrincipal()));
+        var user = userService.loadOrThrow(((AuthUser) auth.getPrincipal()).getId());
+        var userDto = UserMapper.toDto(user);
+        return new AuthResponse(sessionId, userDto);
     }
 
     private String createSessionTokenAndSaveUserToRedis(@NonNull AuthUser user) {
@@ -87,7 +95,6 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(@NonNull String sessionId) {
         redisAuthService.removeUser(sessionId);
-        return;
     }
 
 }

@@ -20,6 +20,16 @@ export class UserService {
     return this._user.asReadonly();
   }
 
+  setUser(user: User) {
+    console.log('Setting user:', user);
+    this._user.set(user);
+  }
+
+  /** Clear cached user */
+  clearUser() {
+    this._user.set(null);
+  }
+
   get isAuthenticated() {
     return !!this._user();
   }
@@ -30,6 +40,7 @@ export class UserService {
 
   /** Fetch user from backend only if not cached */
   async fetchUser(): Promise<User | null> {
+    console.log('Fetching user');
     if (this._user()) {
       return this._user();
     }

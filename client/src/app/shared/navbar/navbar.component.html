@@ -1,25 +1,22 @@
 <nav class="navbar">
   <div class="container navbar__inner">
-    <div class="navbar__logo" routerLink="/lobby">
+    <div class="navbar__logo" routerLink="/">
       ALIAS GAME
     </div>
 
     <div class="navbar__actions">
-      <a
-        [routerLink]="['/','auth','login']"
-        routerLinkActive="is-active"
-        class="btn btn-outline-secondary"
-      >
+      @if (isAuthenticated){
+        <button class="btn btn-outline-danger btn-logout" (click)="logout()">
+          Logout
+        </button>
+      } @else {
+      <a [routerLink]="AUTH_ROUTES_FULL.LOGIN" routerLinkActive="is-active" class="btn btn-outline-secondary">
         Login
       </a>
-
-      <a
-        [routerLink]="['/','auth','register']"
-        routerLinkActive="is-active"
-        class="btn btn-primary"
-      >
+      <a [routerLink]="AUTH_ROUTES_FULL.REGISTER" routerLinkActive="is-active" class="btn btn-primary">
         Register
       </a>
+      }
     </div>
   </div>
 </nav>

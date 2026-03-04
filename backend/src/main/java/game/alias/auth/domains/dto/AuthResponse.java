@@ -1,5 +1,7 @@
 package game.alias.auth.domains.dto;
 
-public record AuthResponse(String sessionId, AuthUserDto authUserDto) {
+import game.alias.user.domains.dto.UserDto;
+
+public record AuthResponse(String sessionId, UserDto UserDto) {
 
 }

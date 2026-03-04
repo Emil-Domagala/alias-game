@@ -51,15 +51,12 @@ public class JwtService {
                     .verifyWith((SecretKey) key())
                     .build().parseSignedClaims(token)
                     .getPayload().getSubject();
-        } catch (ExpiredJwtException e) {
-            log.error("ExpiredJwtException", e);
-            throw new AuthException("Token expired", e);
         } catch (JwtException e) {
-            log.error("JwtException", e);
-            throw new AuthException("Token expired", e);
+            log.warn("Token expired", e);
+            throw e;
         } catch (Exception e) {
-            log.error("Exception", e);
-            throw new AuthException("Token expired", e);
+            log.warn("Unknown Error Occurred:", e);
+            throw e;
         }
     }
 

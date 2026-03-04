@@ -1,5 +1,6 @@
 package game.alias.auth.rest;
 
+import game.alias.user.domains.dto.UserDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +33,8 @@ public class AuthPublicController {
     private final AuthCookieService authCookieService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthUserDto> register(@RequestBody @Valid UserRegisterRequest userRegisterRequest,
-            HttpServletResponse res) {
+    public ResponseEntity<UserDto> register(@RequestBody @Valid UserRegisterRequest userRegisterRequest,
+                                            HttpServletResponse res) {
         log.debug("Registering user {}", userRegisterRequest.email());
 
         AuthResponse authRes = authService.register(userRegisterRequest);
@@ -45,11 +46,11 @@ public class AuthPublicController {
         log.debug("authRes: {}", authRes.toString());
 
 
-        return ResponseEntity.ok(authRes.authUserDto());
+        return ResponseEntity.ok(authRes.UserDto());
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthUserDto> login(
+    public ResponseEntity<UserDto> login(
             @RequestBody @Valid UserLoginRequest userLoginRequest,
             HttpServletResponse res) {
 
@@ -59,12 +60,7 @@ public class AuthPublicController {
 
         res.addHeader(HttpHeaders.SET_COOKIE, sessionCookie.toString());
 
-        return ResponseEntity.ok(authRes.authUserDto());
-    }
-
-    @GetMapping("/me")
-    public AuthUser me(@AuthenticationPrincipal AuthUser user) {
-        return user;
+        return ResponseEntity.ok(authRes.UserDto());
     }
 
 }

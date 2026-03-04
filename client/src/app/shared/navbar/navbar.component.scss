@@ -40,3 +40,18 @@
   border-color: var(--color-primary);
   color: var(--text-primary);
 }
+
+.btn-logout {
+  padding-inline: var(--space-md);
+  border-radius: var(--radius-pill);
+  font-weight: 500;
+  transition: box-shadow var(--transition-fast);
+
+  &:not(:disabled):hover {
+    box-shadow: var(--shadow-sm);
+  }
+
+  &:not(:disabled):active {
+    box-shadow: none;
+  }
+}

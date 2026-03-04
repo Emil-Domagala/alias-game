@@ -2,8 +2,12 @@ package game.alias.auth.session;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.UUID;
 
 import game.alias.auth.session.exceptions.AuthException;
+import game.alias.common.ApiVersion;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
@@ -37,6 +41,16 @@ public class CookieAuthFilter extends OncePerRequestFilter {
         this.redisAuthService = redisAuthService;
         this.exceptionResolver = exceptionResolver;
         this.authCookieService = authCookieService;
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+
+        return path.startsWith("/ws/")
+                || path.startsWith("/swagger-ui/")
+                || path.startsWith("/v3/api-docs/")
+                || path.startsWith(ApiVersion.V1Public);
     }
 
     @Value("${session.cookie.auth.name}")
@@ -77,7 +91,8 @@ public class CookieAuthFilter extends OncePerRequestFilter {
                 return;
             }
 
-            var refreshedCookie = authCookieService.create(sessionId);
+            String refreshedToken = jwtService.generateSessionToken(UUID.fromString(sessionId));
+            var refreshedCookie = authCookieService.create(refreshedToken);
             response.addHeader("Set-Cookie", refreshedCookie.toString());
 
             AuthUser user = redisAuthService.getUserFromSessionAndExtend(sessionId);
@@ -93,9 +108,18 @@ public class CookieAuthFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(auth);
 
             filterChain.doFilter(request, response);
-        }catch (Exception e){
-            log.error("Error in CookieAuthFilter", e);
+        } catch (ExpiredJwtException e) {
+            log.warn("ExpiredJwtException", e);
+            exceptionResolver.resolveException(request, response, null, new AuthException("Token expired", e));
+        } catch (JwtException e) {
+            log.warn("JwtException", e);
+            exceptionResolver.resolveException(request, response, null, new AuthException("Invalid token", e));
+        } catch (AuthException e) {
+            log.warn("AuthException", e);
             exceptionResolver.resolveException(request, response, null, e);
+        } catch (Exception e) {
+            log.error("Unexpected exception", e);
+            exceptionResolver.resolveException(request, response, null, new AuthException("Unknown error", e));
         }
     }
 

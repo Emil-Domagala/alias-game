@@ -14,6 +14,7 @@ import {AuthService} from '../auth.service';
 })
 export class LoginComponent {
   authService = inject(AuthService);
+  isSubmitting = signal(false);
 
   loginModel= signal<UserLoginRequest>({
     email:'',
@@ -28,20 +29,20 @@ export class LoginComponent {
     maxLength(shemaPath.password,USER_CONSTRAINTS.PASSWORD_MAX,{ message: "Password is too long"});
   })
 
-  submit(event: Event){
+  async submit(event: Event) {
     event.preventDefault();
+
     if (this.loginForm().invalid()) return;
 
-    this.authService
-      .login(this.loginForm().value())
-      .subscribe({
-        next: (data) => {
-          console.log(data)
-        },
-        error: err => {
-          // handle error
-        },
-      });
+    this.isSubmitting.set(true);
+
+    try {
+      const user = await this.authService.login(this.loginForm().value());
+    } catch (err) {
+      console.error('Login error', err);
+    } finally {
+      this.isSubmitting.set(false);
+    }
   }
 
 }

@@ -15,6 +15,7 @@ import {AuthService} from '../auth.service';
 })
 export class RegisterComponent {
   authService = inject(AuthService);
+  isSubmitting = signal(false);
 
   registerModel = signal<UserRegisterRequest>({
     email: '',
@@ -33,19 +34,19 @@ export class RegisterComponent {
     maxLength(shemaPath.nick,USER_CONSTRAINTS.NICK_MAX,{ message: "Nick is too long"});
   })
 
-  submit(event: Event){
+  async submit(event: Event) {
     event.preventDefault();
+
     if (this.registerForm().invalid()) return;
 
-    this.authService
-      .register(this.registerForm().value())
-      .subscribe({
-        next: (data) => {
-          console.log(data)
-        },
-        error: err => {
-          // handle error
-        },
-      });
+    this.isSubmitting.set(true);
+
+    try {
+      const user = await this.authService.register(this.registerForm().value());
+    } catch (err) {
+      console.error('Registration error', err);
+    } finally {
+      this.isSubmitting.set(false);
+    }
   }
 }
