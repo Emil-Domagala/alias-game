@@ -9,7 +9,7 @@ import { FieldState, MaybeFieldTree } from '@angular/forms/signals';
 export class FormFieldComponent<T = any> {
   label = input.required<string>();
   hint = input<string>();
-  field = input.required<MaybeFieldTree<T>>();
+  formField = input.required<MaybeFieldTree<T>>();
   forId = input.required<string>();
 
   /**
@@ -17,7 +17,7 @@ export class FormFieldComponent<T = any> {
    * Field is required, so we always expect something here.
    */
   get control(): FieldState<T> {
-    const f = this.field();
+    const f = this.formField();
     if (!f) {
       throw new Error('[FormFieldComponent] field() returned undefined');
     }

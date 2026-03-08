@@ -10,12 +10,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@SuperBuilder
 @MappedSuperclass
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class BaseEntity {

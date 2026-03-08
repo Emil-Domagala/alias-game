@@ -4,9 +4,10 @@ import {LoginComponent} from './auth/login/login.component';
 import {RoomComponent} from './room/room.component';
 import {LobbyComponent} from './lobby/lobby.component';
 import {AUTH_ROUTES, AUTH_ROUTES_SEGMENTS} from './auth/auth.router';
+import {authResolver} from './auth/auth.resolver';
 
 export const routes: Routes = [
   {path: AUTH_ROUTES_SEGMENTS.ROOT, children: AUTH_ROUTES },
-  { path: 'lobby', component: LobbyComponent },
+  { path: 'lobby', component: LobbyComponent, resolve: { auth: authResolver} },
   { path: 'room/:id', component: RoomComponent },
 ];

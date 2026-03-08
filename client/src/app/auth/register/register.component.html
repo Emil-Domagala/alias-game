@@ -4,12 +4,12 @@
   <app-form-field
     label="Email"
     forId="email"
-    [field]="registerForm.email"
+    [formField]="registerForm.email"
   >
     <input
       id="email"
       type="email"
-      [field]="registerForm.email"
+      [formField]="registerForm.email"
       placeholder="you@example.com"
     />
   </app-form-field>
@@ -17,12 +17,12 @@
   <app-form-field
     label="Username"
     forId="nick"
-    [field]="registerForm.nick"
+    [formField]="registerForm.nick"
   >
     <input
       id="nick"
       type="text"
-      [field]="registerForm.nick"
+      [formField]="registerForm.nick"
       placeholder="your username"
     />
   </app-form-field>
@@ -30,12 +30,12 @@
   <app-form-field
     label="Password"
     forId="password"
-    [field]="registerForm.password"
+    [formField]="registerForm.password"
   >
     <input
       id="password"
       type="password"
-      [field]="registerForm.password"
+      [formField]="registerForm.password"
     />
   </app-form-field>
 
@@ -49,7 +49,7 @@
 
   <p class="auth-switch">
     Already have an account?
-    <a [routerLink]="['/','auth','login']" class="link">Login here</a>.
+    <a [routerLink]="[AUTH_ROUTES_FULL.LOGIN]" class="link">Login here</a>.
   </p>
 
 </form>

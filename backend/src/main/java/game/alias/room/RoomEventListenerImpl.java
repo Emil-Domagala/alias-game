@@ -1,6 +1,7 @@
 package game.alias.room;
 
 import game.alias.common.WebSocketDestinations;
+import game.alias.room.domains.Room;
 import game.alias.room.domains.RoomException;
 import game.alias.room.domains.RoomMapper;
 import game.alias.room.event.RoomCreatedEvent;
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Slf4j
 public class RoomEventListenerImpl implements RoomEventListener{
-    private final RoomCacheRepository roomCacheRepository;
+    private final RoomService roomService;;
     private final PlayerService playerService;
     private final SimpMessagingTemplate template;
     private final RoomMapper roomMapper;
@@ -31,7 +32,7 @@ public class RoomEventListenerImpl implements RoomEventListener{
     @EventListener(RoomPlayerJoinedEvent.class)
     public void onPlayerJoined(RoomPlayerJoinedEvent event) {
         log.info("Player joined room. roomId={}, playerId={}", event.roomId(), event.userId());
-        var room = roomCacheRepository.findById(event.roomId()).orElseThrow(()-> new RoomException("Room not found"));
+        Room room = roomService.loadRoomOrThrow(event.roomId());
 
         template.convertAndSend(WebSocketDestinations.roomTopic(room.getId()),new RoomPlayerJoinedEvent(event.roomId(), event.userId()));
     }
@@ -40,7 +41,7 @@ public class RoomEventListenerImpl implements RoomEventListener{
     @EventListener(RoomPlayerLeftEvent.class)
     public void onPlayerLeft(RoomPlayerLeftEvent event) {
         log.info("Player left room. roomId={}, playerId={}", event.roomId(), event.userId());
-        var room = roomCacheRepository.findById(event.roomId()).orElseThrow(()-> new RoomException("Room not found"));
+        Room room = roomService.loadRoomOrThrow(event.roomId());
         var owner = playerService.loadExistingPlayer(room.getOwnerId());
         var roomDto = roomMapper.toRoomDto(room, owner);
 
@@ -51,7 +52,7 @@ public class RoomEventListenerImpl implements RoomEventListener{
     @Override
     @EventListener(RoomCreatedEvent.class)
     public void onRoomCreated(RoomCreatedEvent event) {
-        var room = roomCacheRepository.findById(event.roomId()).orElseThrow(() -> new RoomException("Room not found"));
+        Room room = roomService.loadRoomOrThrow(event.roomId());
         log.info("Room created. roomId={}, ownerId={}, maxPlayers={}, minPlayers={}", room.getId(), room.getOwnerId(), room.getMaxPlayers(), room.getMinPlayers());
         var owner = playerService.loadExistingPlayer(room.getOwnerId());
         var roomDto = roomMapper.toRoomDto(room, owner);

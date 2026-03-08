@@ -1,15 +1,15 @@
 <h1>Create room</h1>
 
-<form (submit)="submit()">
+<form (ngSubmit)="submit()">
   <app-form-field
     label="Room name"
     forId="name"
-    [field]="createRoom.name"
+    [formField]="createRoom.name"
   >
     <input
       id="name"
       type="text"
-      [field]="createRoom.name"
+      [formField]="createRoom.name"
       placeholder="Room name"
     />
   </app-form-field>
@@ -17,36 +17,36 @@
   <app-form-field
     label="Minimum players"
     forId="minPlayers"
-    [field]="createRoom.minPlayers"
+    [formField]="createRoom.minPlayers"
   >
     <input
       id="minPlayers"
       type="number"
-      [field]="createRoom.minPlayers"
+      [formField]="createRoom.minPlayers"
     />
   </app-form-field>
 
   <app-form-field
     label="Maximum players"
     forId="maxPlayers"
-    [field]="createRoom.maxPlayers"
+    [formField]="createRoom.maxPlayers"
   >
     <input
       id="maxPlayers"
       type="number"
-      [field]="createRoom.maxPlayers"
+      [formField]="createRoom.maxPlayers"
     />
   </app-form-field>
 
   <app-form-field
     label="Number of teams"
     forId="numberOfTeams"
-    [field]="createRoom.numberOfTeams"
+    [formField]="createRoom.numberOfTeams"
   >
     <input
       id="numberOfTeams"
       type="number"
-      [field]="createRoom.numberOfTeams"
+      [formField]="createRoom.numberOfTeams"
     />
   </app-form-field>
 

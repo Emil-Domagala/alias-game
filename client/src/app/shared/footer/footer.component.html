@@ -12,9 +12,10 @@
     <div class="footer__links">
       @if (isAuthenticated) {
         <a routerLink="/lobby" class="link link-secondary">Lobby</a>
-      }
+      } @else {
       <a [routerLink]="AUTH_ROUTES_FULL.LOGIN" class="link link-secondary">Login</a>
       <a [routerLink]="AUTH_ROUTES_FULL.REGISTER" class="link link-secondary">Register</a>
+      }
     </div>
   </div>
 </footer>

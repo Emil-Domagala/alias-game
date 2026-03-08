@@ -3,213 +3,207 @@ package game.alias.room;
 import game.alias.auth.AuthUser;
 import game.alias.common.pagination.PaginationRequest;
 import game.alias.common.pagination.PaginationResult;
+import game.alias.common.pagination.PaginationUtils;
+import game.alias.player.PlayerService;
+import game.alias.player.domains.Player;
 import game.alias.room.domains.Room;
 import game.alias.room.domains.RoomException;
 import game.alias.room.domains.RoomStatus;
+import game.alias.room.domains.dto.RoomWithPlayers;
+import game.alias.room.domains.dto.RoomWithUsers;
 import game.alias.room.domains.request.CreateRoomRequest;
-import jakarta.annotation.PostConstruct;
+import game.alias.user.UserService;
+import game.alias.user.domains.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import java.time.Duration;
 import java.util.*;
-import java.util.stream.StreamSupport;
+import java.util.function.Supplier;
 
 @Service
 @RequiredArgsConstructor
 public class RoomServiceImpl implements RoomService{
-    private final RoomCacheRepository roomCacheRepository;
+
+    private final UserService userService;
+    private final RoomRepository roomRepository;
+    private final PlayerService playerService;
     private final StringRedisTemplate redisTemplate;
     private final RoomEventPublisher roomEventPublisher;
 
-    @PostConstruct
-    void check() {
-        Assert.notNull(redisTemplate, "StringRedisTemplate is NOT injected");
+    /* --------------------------- ROOM FETCH --------------------------- */
+
+    @Override
+    public RoomWithPlayers findUsersInRoom(UUID roomId) {
+        Room room = loadRoomOrThrow(roomId);
+        List<Player> players = playerService.findAllByIds(new ArrayList<>(room.getPlayersId()));
+        return new RoomWithPlayers(room, players);
     }
 
     @Override
-    public Room create(CreateRoomRequest request, AuthUser user) {
-        UUID userId = user.getId();
-        String lockKey = "room:create:lock:" + userId;
-        Boolean lockAcquired = redisTemplate.opsForValue()
-                .setIfAbsent(lockKey, "1", Duration.ofSeconds(5));
+    public RoomWithUsers getRoomWithUsers(UUID roomId) {
+        Room room = loadRoomOrThrow(roomId);
+        List<User> users = userService.findAllByIds(new ArrayList<>(room.getPlayersId()));
+        return new RoomWithUsers(room, users);
+    }
 
-        if(Boolean.FALSE.equals(lockAcquired)){
-            throw new RoomException("Room creation already in progress");
-        }
-        try {
-            Optional<Room> existingRoom = roomCacheRepository.findByOwnerId(user.getId());
-            if (existingRoom.isPresent()) {
-                throw new RoomException("You already own room with ID: " + existingRoom.get().getId());
-            }
+    @Override
+    public PaginationResult<Room> getRooms(PaginationRequest request) {
+        var pageable = PaginationUtils.getPageable(request);
+
+        Page<Room> page = roomRepository.findAll(pageable);
+
+        return new PaginationResult<>(
+                page.getContent(),
+                page.getTotalPages(),
+                page.getTotalElements(),
+                page.getSize(),
+                page.getNumber(),
+                page.isEmpty()
+        );
+    }
+
+    @Override
+    public Optional<Room> findRoomByPlayer(UUID playerId) {
+        return roomRepository.findByPlayerId(playerId);
+    }
+
+    /* --------------------------- ROOM CREATION --------------------------- */
+
+    @Override
+    public Room create(CreateRoomRequest request, AuthUser user) {
+        return withRedisLock("room:create:lock:" + user.getId(), () -> {
+            roomRepository.findByOwnerId(user.getId())
+                    .ifPresent(r -> { throw new RoomException("You already own room with ID: " + r.getId()); });
 
             int playersPerTeam = request.maxPlayers() / request.numberOfTeams();
-
-            if (playersPerTeam < 2){
-                throw new RoomException("Team must have at least 2 people, increase min players number or decrese number of teams");
+            if (playersPerTeam < 2) {
+                throw new RoomException("Team must have at least 2 people. Adjust min players or number of teams.");
             }
 
-            Set<UUID> players = new HashSet<>();
-            players.add(user.getId());
 
-            Room roomToSave = Room.builder()
+            Room room = Room.builder()
                     .name(request.name())
                     .ownerId(user.getId())
                     .maxPlayers(request.maxPlayers())
                     .minPlayers(request.minPlayers())
-                    .playersId(players)
-                    .ttl(Duration.ofHours(1).getSeconds())
+                    .numberOfTeams(request.numberOfTeams())
+                    .status(RoomStatus.WAITING)
+                    .playersId(List.of(user.getId()))
                     .build();
-           var savedRoom =  roomCacheRepository.save(roomToSave);
 
-           roomEventPublisher.roomCreated(savedRoom);
-
-           return  savedRoom;
-        }finally {
-            if (Boolean.TRUE.equals(lockAcquired)) {
-                redisTemplate.delete(lockKey);
-            }
-        }
+            Room savedRoom = roomRepository.save(room);
+            roomEventPublisher.roomCreated(savedRoom);
+            return savedRoom;
+        });
     }
 
-    @Override
-    public Room delete(UUID roomId, AuthUser user) {
-        String lockKey = "room:delete:lock:" + roomId;
-
-        Boolean lockAcquired = redisTemplate.opsForValue()
-                .setIfAbsent(lockKey, "1", Duration.ofSeconds(5));
-
-        if (Boolean.FALSE.equals(lockAcquired)) {
-            throw new RoomException("Room deletion already in progress");
-        }
-
-        try {
-            Room room = roomCacheRepository.findById(roomId).orElseThrow(
-                    () -> new EntityNotFoundException("Room with such ID does not exist")
-            );
-
-            if (!room.getOwnerId().equals(user.getId())) {
-                throw new RoomException("You are not the owner of this room");
-            }
-
-          if(room.getStatus()== RoomStatus.IN_GAME){
-              throw new RoomException("Room is in game and cannot be deleted");
-          }
-
-            roomCacheRepository.delete(room);
-
-            roomEventPublisher.roomDeleted(room);
-
-            return room;
-        } finally {
-            redisTemplate.delete(lockKey);
-        }
-    }
-
-    @Override
-    public Room leaveRoom(UUID roomId, AuthUser user){
-        String lockKey = "room:lock:" + roomId;
-
-        Boolean locked = redisTemplate.opsForValue()
-                .setIfAbsent(lockKey, "1", Duration.ofSeconds(5));
-
-        if (Boolean.FALSE.equals(locked)) {
-            throw new RoomException("Room is busy");
-        }
-
-        try{
-            Room room = loadRoomOrThrow(roomId);
-            if(room.getStatus()==RoomStatus.IN_GAME){
-                throw new RoomException("Room is in game and cannot be left");
-            }
-
-            if(!room.getPlayersId().contains(user.getId())){
-                throw new RoomException("User is not a member of this room");
-            }
-
-            if(room.getOwnerId().equals(user.getId())){
-                delete(roomId, user);
-            }
-
-            room.getPlayersId().remove(user.getId());
-
-            if(room.getPlayersId().size()<room.getMinPlayers()){
-                room.setStatus(RoomStatus.WAITING);
-            }
-
-            roomCacheRepository.save(room);
-
-            roomEventPublisher.playerLeft(room.getId(), user.getId());
-            return room;
-        }finally {
-            redisTemplate.delete(lockKey);
-        }
-    }
+    /* --------------------------- ROOM JOIN/LEAVE --------------------------- */
 
     @Override
     public Room joinRoom(UUID roomId, AuthUser user) {
-
-        String lockKey = "room:lock:" + roomId;
-
-        Boolean locked = redisTemplate.opsForValue()
-                .setIfAbsent(lockKey, "1", Duration.ofSeconds(5));
-
-        if (Boolean.FALSE.equals(locked)) {
-            throw new RoomException("Room is busy");
-        }
-
-        try {
+        return withRedisLock("room:lock:" + roomId, () -> {
+            Room existingRoom = roomRepository.findByPlayerId(user.getId()).orElse(null);
+            if (existingRoom != null) {
+                throw new RoomException(
+                        "You are already a member of room: " + existingRoom.getId()
+                );
+            }
             Room room = loadRoomOrThrow(roomId);
 
-            if (room.getPlayersId().contains(user.getId())) {
-                throw new RoomException("You are already a member of this room");
-            }
             if (room.getStatus() != RoomStatus.WAITING) {
                 throw new RoomException("Room is not in waiting state");
             }
-
             if (room.getPlayersId().size() >= room.getMaxPlayers()) {
                 throw new RoomException("Room is full");
             }
 
             room.getPlayersId().add(user.getId());
-
-            if(room.getPlayersId().size()==room.getMaxPlayers()){
+            if (room.getPlayersId().size() == room.getMaxPlayers()) {
                 room.setStatus(RoomStatus.FULL);
             }
 
-            roomCacheRepository.save(room);
-
+            Room savedRoom = roomRepository.save(room);
             roomEventPublisher.playerJoined(room.getId(), user.getId());
-            return room;
-        } finally {
-            redisTemplate.delete(lockKey);
-        }
-    }
-
-    public Room loadRoomOrThrow(UUID roomId){
-        return roomCacheRepository.findById(roomId)
-                .orElseThrow(()->new EntityNotFoundException("Room from which user wanna leave do not exists"));
+            return savedRoom;
+        });
     }
 
     @Override
-    public PaginationResult<Room> getRooms(PaginationRequest request) {
-        List<Room> rooms = StreamSupport
-                .stream(roomCacheRepository.findAll().spliterator(), false)
-                .toList();
+    public Room leaveRoom(UUID roomId, AuthUser user) {
+        return withRedisLock("room:lock:" + roomId, () -> {
+            Room room = loadRoomOrThrow(roomId);
 
-        return new PaginationResult<>(
-                rooms,
-                0,
-                rooms.size(),
-                request.getSize(),
-                request.getPage(),
-                rooms.isEmpty()
-        );
+            if (room.getStatus() == RoomStatus.IN_GAME) {
+                throw new RoomException("Room is in game and cannot be left");
+            }
+            if (!room.getPlayersId().contains(user.getId())) {
+                throw new RoomException("User is not a member of this room");
+            }
 
+            if (room.getOwnerId().equals(user.getId())) {
+                delete(roomId, user);
+                return room;
+            }
+
+            room.getPlayersId().remove(user.getId());
+            if (room.getPlayersId().size() < room.getMinPlayers()) {
+                room.setStatus(RoomStatus.WAITING);
+            }
+
+            Room savedRoom = roomRepository.save(room);
+            roomEventPublisher.playerLeft(room.getId(), user.getId());
+            return savedRoom;
+        });
+    }
+
+    /* --------------------------- ROOM DELETE --------------------------- */
+
+    @Override
+    public Room delete(UUID roomId, AuthUser user) {
+        return withRedisLock("room:delete:lock:" + roomId, () -> {
+            Room room = roomRepository.findById(roomId)
+                    .orElseThrow(() -> new EntityNotFoundException("Room with such ID does not exist"));
+
+            if (!room.getOwnerId().equals(user.getId())) {
+                throw new RoomException("You are not the owner of this room");
+            }
+            if (room.getStatus() == RoomStatus.IN_GAME) {
+                throw new RoomException("Room is in game and cannot be deleted");
+            }
+
+            roomRepository.delete(room);
+            roomEventPublisher.roomDeleted(room);
+            return room;
+        });
+    }
+
+    /* --------------------------- HELPERS --------------------------- */
+
+    public Room loadRoomOrThrow(UUID roomId) {
+        return roomRepository.findById(roomId)
+                .orElseThrow(() -> new EntityNotFoundException("Room does not exist"));
+    }
+
+    /**
+     * Executes a supplier with a Redis lock, automatically releasing after execution.
+     */
+    private <T> T withRedisLock(String lockKey, Supplier<T> action) {
+        Boolean locked = redisTemplate.opsForValue()
+                .setIfAbsent(lockKey, "1", Duration.ofSeconds(5));
+
+        if (Boolean.FALSE.equals(locked)) {
+            throw new RoomException("Operation in progress, please try again later");
+        }
+
+        try {
+            return action.get();
+        } finally {
+            redisTemplate.delete(lockKey);
+        }
     }
 
 }

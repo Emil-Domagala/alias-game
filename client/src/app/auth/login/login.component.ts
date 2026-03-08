@@ -1,14 +1,15 @@
 import {Component, inject, signal} from '@angular/core';
 import {UserLoginRequest} from './UserLoginRequest.interface';
-import {email, Field, form, maxLength, minLength, required} from '@angular/forms/signals';
+import {email, form, FormField, maxLength, minLength, required} from '@angular/forms/signals';
 import {USER_CONSTRAINTS} from '../user.constraints';
 import {FormFieldComponent} from '../../shared/form/form-field/form-field.component';
 import {RouterLink} from '@angular/router';
 import {AuthService} from '../auth.service';
+import {AUTH_ROUTES_FULL} from '../auth.router';
 
 @Component({
   selector: 'app-login',
-  imports: [Field, FormFieldComponent, RouterLink],
+  imports: [FormFieldComponent, RouterLink, FormField],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -45,4 +46,5 @@ export class LoginComponent {
     }
   }
 
+  protected readonly AUTH_ROUTES_FULL = AUTH_ROUTES_FULL;
 }

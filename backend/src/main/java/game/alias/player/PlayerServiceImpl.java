@@ -90,4 +90,46 @@ public class PlayerServiceImpl implements PlayerService {
         }
        return playerCacheRepository.save(player);
     }
+
+    @Override
+    public List<Player> findAllByIds(ArrayList<UUID> uuids) {
+        if (uuids == null || uuids.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Map<UUID, Player> resultMap = new LinkedHashMap<>();
+
+        playerCacheRepository.findAllById(uuids)
+                .forEach(player -> {
+                    player.setTtl(Duration.ofHours(1).getSeconds());
+                    resultMap.put(player.getId(), player);
+                });
+
+        Set<UUID> missingIds = uuids.stream()
+                .filter(id -> !resultMap.containsKey(id))
+                .collect(Collectors.toSet());
+
+        if (!missingIds.isEmpty()) {
+            userRepository.findAllById(missingIds)
+                    .forEach(user -> {
+                        Player player = Player.builder()
+                                .id(user.getId())
+                                .nick(user.getNick())
+                                .ttl(Duration.ofHours(1).getSeconds())
+                                .build();
+                        resultMap.put(user.getId(), player);
+                    });
+
+            playerCacheRepository.saveAll(
+                    resultMap.values().stream()
+                            .filter(p -> missingIds.contains(p.getId()))
+                            .toList()
+            );
+        }
+
+        return uuids.stream()
+                .map(resultMap::get)
+                .filter(Objects::nonNull)
+                .toList();
+    }
 }

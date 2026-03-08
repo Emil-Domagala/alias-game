@@ -1,15 +1,16 @@
 import { Component, inject, signal} from '@angular/core';
-import {form, Field, required, email, minLength, maxLength} from '@angular/forms/signals';
+import {form, required, email, minLength, maxLength, FormField} from '@angular/forms/signals';
 import {UserRegisterRequest} from './UserRegisterRequest.interface';
 import {USER_CONSTRAINTS} from '../user.constraints';
 import {CommonModule} from '@angular/common';
 import {FormFieldComponent} from '../../shared/form/form-field/form-field.component';
 import {RouterLink} from '@angular/router';
 import {AuthService} from '../auth.service';
+import {AUTH_ROUTES_FULL} from '../auth.router';
 
 @Component({
   selector: 'app-register',
-  imports: [Field, CommonModule, FormFieldComponent, RouterLink],
+  imports: [CommonModule, FormFieldComponent, RouterLink, FormField],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
 })
@@ -49,4 +50,6 @@ export class RegisterComponent {
       this.isSubmitting.set(false);
     }
   }
+
+  protected readonly AUTH_ROUTES_FULL = AUTH_ROUTES_FULL;
 }
