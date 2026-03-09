@@ -1,9 +1,8 @@
 package game.alias.room;
 
 import game.alias.auth.AuthUser;
-import game.alias.common.pagination.PaginationRequest;
 import game.alias.common.pagination.PaginationResult;
-import game.alias.common.pagination.PaginationUtils;
+import game.alias.common.pagination.QueryFilter;
 import game.alias.player.PlayerService;
 import game.alias.player.domains.Player;
 import game.alias.room.domains.Room;
@@ -17,6 +16,8 @@ import game.alias.user.domains.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,7 @@ public class RoomServiceImpl implements RoomService{
     private final PlayerService playerService;
     private final StringRedisTemplate redisTemplate;
     private final RoomEventPublisher roomEventPublisher;
+    private final RoomSpecificationBuilder roomSpecificationBuilder;
 
     /* --------------------------- ROOM FETCH --------------------------- */
 
@@ -51,10 +53,13 @@ public class RoomServiceImpl implements RoomService{
     }
 
     @Override
-    public PaginationResult<Room> getRooms(PaginationRequest request) {
-        var pageable = PaginationUtils.getPageable(request);
+    public PaginationResult<Room> getRooms(Pageable pageable, List<QueryFilter> filters) {
+        Specification<Room> spec = filters.stream()
+                        .map(roomSpecificationBuilder::buildFilterSpecification)
+                        .reduce(Specification::and)
+                        .orElse(null);
 
-        Page<Room> page = roomRepository.findAll(pageable);
+        Page<Room> page = roomRepository.findAll(spec, pageable);
 
         return new PaginationResult<>(
                 page.getContent(),

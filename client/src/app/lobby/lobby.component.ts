@@ -6,6 +6,7 @@ import { ModalService } from '../shared/modal/modal.service';
 import { RoomsListComponent } from './rooms-list/rooms-list.component';
 import { RoomDto } from '../room/roomDto.interface';
 import { WebSocketService } from '../web-socket.service';
+import {QueryConfig} from '../shared/query-config/query-config-model.model';
 
 @Component({
   selector: 'app-lobby',
@@ -22,11 +23,18 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   /** Signal to hold all rooms in the lobby */
   rooms = signal<RoomDto[]>([]);
+  config: QueryConfig | null = null;
 
   ngOnInit() {
+    this.loadConfig();
     this.loadRooms();
     this.connectWebSocket();
     this.loadCurrentRoom();
+  }
+
+  private async loadConfig() {
+    this.config = await this.service.getRoomConfig();
+    console.log('Room service config:', this.config);
   }
 
   /** Load rooms from backend */

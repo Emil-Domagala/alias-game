@@ -2,19 +2,16 @@ package game.alias.room;
 
 import game.alias.auth.AuthUser;
 import game.alias.common.ApiVersion;
-import game.alias.common.pagination.PaginationRequest;
-import game.alias.common.pagination.PaginationResult;
+import game.alias.common.pagination.*;
 import game.alias.player.domains.Player;
-import game.alias.player.domains.PlayerMapper;
 import game.alias.room.domains.Room;
 import game.alias.room.domains.RoomMapper;
 import game.alias.room.domains.dto.RoomDto;
-import game.alias.room.domains.dto.RoomWithPlayersDto;
 import game.alias.room.domains.request.CreateRoomRequest;
 import game.alias.player.PlayerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +30,12 @@ public class RoomController {
     private final RoomMapper mapper;
 
     private final PlayerService playerService;
-    private final PlayerMapper playerMapper;
+    private final RoomQueryConfigProvider queryConfigProvider;
+
+    @GetMapping("/config")
+    public ResponseEntity<QueryConfigModel.QueryConfig> getRoomsConfig() {
+        return ResponseEntity.ok(queryConfigProvider.getConfig());
+    }
 
     @PostMapping("/create")
     public ResponseEntity<RoomDto>createRoom(@Valid @RequestBody CreateRoomRequest request, @AuthenticationPrincipal AuthUser user){
@@ -52,24 +54,17 @@ public class RoomController {
 
     @GetMapping()
     public ResponseEntity<PaginationResult<RoomDto>>getRooms(
-            @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer size,
-            @RequestParam(required = false) String sortField,
-            @RequestParam(required = false) Sort.Direction direction
+            Pageable pageable,
+            @RequestParam(required = false) List<String> filter
     ){
-        if(sortField == null || !RoomDto.ALLOWED_SORT_FIELDS.contains(sortField)){
-            sortField = RoomDto.DEFAULT_SORT_FIELD;
-            direction = Sort.Direction.ASC;
-        }
+        List<QueryFilter> filters = FilterParser.parse(filter);
 
-        final var paginationRequest = new PaginationRequest(page, size, sortField, direction);
+        Pageable validatedPageable = QueryValidator.validatePageable(pageable, queryConfigProvider.getConfig());
+        QueryValidator.validateFilters(filters, queryConfigProvider.getConfig());
 
-        PaginationResult<Room> paginatedRooms = service.getRooms(paginationRequest);
-
+        PaginationResult<Room> paginatedRooms = service.getRooms(validatedPageable, filters);
         Set<UUID> ownersId = paginatedRooms.getContent().stream().map(Room::getOwnerId).collect(Collectors.toSet());
-
         Map<UUID, Player> ownersById = playerService.loadExistingPlayers(ownersId).stream().collect(Collectors.toMap(Player::getId, Function.identity()));
-
         List<RoomDto> roomDtos = paginatedRooms.getContent().stream().map(room->mapper.toRoomDto(room,ownersById.get(room.getOwnerId()))).toList();
 
         PaginationResult<RoomDto> result =

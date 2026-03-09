@@ -1,0 +1,25 @@
+package game.alias.room;
+
+import game.alias.common.pagination.QueryConfigBuilder;
+import game.alias.common.pagination.QueryConfigModel;
+import game.alias.room.domains.RoomStatus;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+public class RoomQueryConfigProvider {
+    public QueryConfigModel.QueryConfig getConfig() {
+        return new QueryConfigBuilder()
+                .defaultSort("playersCount", Sort.Direction.DESC)
+                .sortField("name", "Room name")
+                .sortField("playersCount", "Players")
+                .sortField("maxPlayers", "Max players")
+                .sortField("minPlayers", "Min players")
+                .filter("roomStatus", QueryConfigModel.FilterType.SELECT, List.of(RoomStatus.WAITING.toString(), RoomStatus.FULL.toString(), RoomStatus.IN_GAME.toString()), List.of(QueryConfigModel.FilterOperator.EQ))
+                .filter("roomName", QueryConfigModel.FilterType.TEXT, null, List.of(QueryConfigModel.FilterOperator.CONTAINS))
+                .pageSizes(10,20,50)
+                .build();
+    }
+}
