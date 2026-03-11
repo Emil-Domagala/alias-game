@@ -1,7 +1,7 @@
 import {Component, inject} from '@angular/core';
 import {UserService} from '../../user/user.service';
 import {RouterLink} from '@angular/router';
-import {AUTH_ROUTES_FULL} from '../../auth/auth.router';
+import {AUTH_ROUTES_FULL} from '../../auth/auth.routes';
 
 @Component({
   selector: 'app-footer',

@@ -1,6 +1,6 @@
 import {Component, inject} from '@angular/core';
 import {RouterLink, RouterLinkActive} from '@angular/router';
-import {AUTH_ROUTES_FULL} from '../../auth/auth.router';
+import {AUTH_ROUTES_FULL} from '../../auth/auth.routes';
 import {AuthService} from '../../auth/auth.service';
 import {UserService} from '../../user/user.service';
 

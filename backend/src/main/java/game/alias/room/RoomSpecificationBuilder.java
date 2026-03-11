@@ -10,9 +10,9 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
-public class RoomSpecificationBuilder {
+public class RoomSpecificationBuilder<T> {
 
-    public Specification<Room> buildFilterSpecification(QueryFilter filter) {
+    public Specification<T> buildFilterSpecification(QueryFilter filter) {
         return (root, query, cb) -> {
 
             var path = root.get(filter.field());
@@ -43,5 +43,9 @@ public class RoomSpecificationBuilder {
         if (type.equals(Boolean.class) || type.equals(boolean.class)) return Boolean.parseBoolean(value);
         if (type.isEnum()) return Enum.valueOf((Class<Enum>) type, value);
         throw new IllegalArgumentException("Unsupported type: " + type.getName());
+    }
+
+    public Specification<Room> buildSearchSpecification(String field, String value) {
+        return (root, query, cb) -> cb.like(cb.lower(root.get(field)), "%" + value.toLowerCase() + "%");
     }
 }

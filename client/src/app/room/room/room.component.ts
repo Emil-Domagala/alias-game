@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { WebSocketService } from '../web-socket.service';
+import { WebSocketService } from '../../web-socket.service';
 import {JsonPipe} from '@angular/common';
 import {StompSubscription} from '@stomp/stompjs';
 

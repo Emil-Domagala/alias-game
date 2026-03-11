@@ -13,6 +13,8 @@ public class QueryConfigBuilder {
     private final List<QueryConfigModel.SortField> sortFields = new ArrayList<>();
     private final List<QueryConfigModel.FilterConfig> filters = new ArrayList<>();
     private List<Integer> pageSizes = List.of(10, 20, 50);
+    private List<String> searchFields = new ArrayList<>();
+    private String searchPlaceholder;
 
     public QueryConfigBuilder defaultSort(String field, Sort.Direction direction) {
         this.defaultSort = field;
@@ -35,13 +37,28 @@ public class QueryConfigBuilder {
         return this;
     }
 
-    public QueryConfigModel.QueryConfig build() {
+    public QueryConfigBuilder searchFields(String... fields) {
+        this.searchFields = List.of(fields);
+        return this;
+    }
 
+    public QueryConfigBuilder searchPlaceholder(String placeholder) {
+        this.searchPlaceholder = placeholder;
+        return this;
+    }
+
+    public QueryConfigModel.QueryConfig build() {
         if (defaultSort == null) {
             throw new IllegalStateException("Default sort must be defined");
         }
 
+        QueryConfigModel.SearchConfig searchConfig = null;
+        if (!searchFields.isEmpty()) {
+            searchConfig = new QueryConfigModel.SearchConfig(searchFields, searchPlaceholder);
+        }
+
         return new QueryConfigModel.QueryConfig(
+                searchConfig,
                 new QueryConfigModel.SortConfig(defaultSort, defaultOrder, List.copyOf(sortFields)),
                 List.copyOf(filters),
                 List.copyOf(pageSizes)

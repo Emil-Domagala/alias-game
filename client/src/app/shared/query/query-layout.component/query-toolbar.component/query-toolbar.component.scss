@@ -1,0 +1,75 @@
+.toolbar-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  align-items: flex-end;
+  padding: var(--space-md);
+  background: var(--background-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+
+  .toolbar-control {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xxs);
+    min-width: 120px;
+    &.search-control{
+      flex-grow: 1;
+    }
+
+    .toolbar-label {
+      font-size: var(--font-xs);
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+  }
+}
+
+input.input.search {
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  font-size: var(--font-sm);
+  color: var(--text-primary);
+  background: var(--background-surface);
+  width: 100%;
+
+  &:focus {
+    outline: none;
+    border-color: var(--border-focus);
+  }
+}
+
+select.input {
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: var(--background-surface);
+  color: var(--text-primary);
+  font-size: var(--font-sm);
+
+  &:focus {
+    outline: none;
+    border-color: var(--border-focus);
+  }
+}
+
+button.btn {
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  border: none;
+  background-color: var(--btn-secondary-bg, #ccc);
+  color: var(--btn-secondary-color, #000);
+  cursor: pointer;
+  font-size: var(--font-sm);
+
+  &:hover {
+    background-color: var(--btn-secondary-hover-bg, #bbb);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--border-focus);
+  }
+}

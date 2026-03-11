@@ -1,7 +1,13 @@
 export interface QueryConfig {
+  search?: SearchConfig
   sorting: SortConfig
   filters: FilterConfig[]
   pageSizes: number[]
+}
+
+export interface SearchConfig {
+  fields: string[]
+  placeholder?: string
 }
 
 export interface SortConfig {
@@ -11,8 +17,8 @@ export interface SortConfig {
 }
 
 export interface SortField {
-  name: string
-  displayName: string
+  field: string
+  label: string
 }
 
 export interface FilterConfig {

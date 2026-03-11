@@ -1,0 +1,23 @@
+<div class="query-layout">
+
+  <div class="toolbar">
+    <app-query-toolbar
+      [config]="config()"
+    />
+  </div>
+
+  <div class="content">
+
+    <aside class="filters">
+      <app-query-filters
+        [filters]="config().filters"
+      />
+    </aside>
+
+    <main class="results">
+      <ng-content />
+    </main>
+
+  </div>
+
+</div>

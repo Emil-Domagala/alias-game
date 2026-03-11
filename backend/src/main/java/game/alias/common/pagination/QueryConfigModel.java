@@ -17,11 +17,17 @@ public class QueryConfigModel {
     }
 
     public record QueryConfig (
+            SearchConfig search,
             SortConfig sorting,
             List<FilterConfig> filters,
             List<Integer> pageSizes
     ) {
     }
+
+    public record SearchConfig(
+            List<String> fields,
+            String placeholder
+    ) {}
 
     public record FilterConfig(
             String field,

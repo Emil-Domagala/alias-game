@@ -1,5 +1,5 @@
 import {Component, input} from '@angular/core';
-import {Room} from '../../../room/room.interface';
+import {Room} from '../../../room.interface';
 
 @Component({
   selector: 'app-rooms-list-item',

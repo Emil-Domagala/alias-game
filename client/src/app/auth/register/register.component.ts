@@ -4,9 +4,10 @@ import {UserRegisterRequest} from './UserRegisterRequest.interface';
 import {USER_CONSTRAINTS} from '../user.constraints';
 import {CommonModule} from '@angular/common';
 import {FormFieldComponent} from '../../shared/form/form-field/form-field.component';
-import {RouterLink} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {AuthService} from '../auth.service';
-import {AUTH_ROUTES_FULL} from '../auth.router';
+import {AUTH_ROUTES_FULL} from '../auth.routes';
+import {LOBBY_ROUTES_FULL} from '../../room/lobby/lobby.routes';
 
 @Component({
   selector: 'app-register',
@@ -15,7 +16,8 @@ import {AUTH_ROUTES_FULL} from '../auth.router';
   styleUrl: './register.component.scss',
 })
 export class RegisterComponent {
-  authService = inject(AuthService);
+  private router = inject(Router);
+  private authService = inject(AuthService);
   isSubmitting = signal(false);
 
   registerModel = signal<UserRegisterRequest>({
@@ -44,6 +46,9 @@ export class RegisterComponent {
 
     try {
       const user = await this.authService.register(this.registerForm().value());
+      if (user) {
+        this.router.navigate([LOBBY_ROUTES_FULL.LOBBY]);
+      }
     } catch (err) {
       console.error('Registration error', err);
     } finally {

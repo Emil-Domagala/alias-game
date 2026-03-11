@@ -18,7 +18,8 @@ public class RoomQueryConfigProvider {
                 .sortField("maxPlayers", "Max players")
                 .sortField("minPlayers", "Min players")
                 .filter("roomStatus", QueryConfigModel.FilterType.SELECT, List.of(RoomStatus.WAITING.toString(), RoomStatus.FULL.toString(), RoomStatus.IN_GAME.toString()), List.of(QueryConfigModel.FilterOperator.EQ))
-                .filter("roomName", QueryConfigModel.FilterType.TEXT, null, List.of(QueryConfigModel.FilterOperator.CONTAINS))
+                .searchFields("name")
+                .searchPlaceholder("Search by room name")
                 .pageSizes(10,20,50)
                 .build();
     }

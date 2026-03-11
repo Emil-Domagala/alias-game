@@ -3,9 +3,10 @@ import {UserLoginRequest} from './UserLoginRequest.interface';
 import {email, form, FormField, maxLength, minLength, required} from '@angular/forms/signals';
 import {USER_CONSTRAINTS} from '../user.constraints';
 import {FormFieldComponent} from '../../shared/form/form-field/form-field.component';
-import {RouterLink} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {AuthService} from '../auth.service';
-import {AUTH_ROUTES_FULL} from '../auth.router';
+import {AUTH_ROUTES_FULL} from '../auth.routes';
+import {LOBBY_ROUTES_FULL} from '../../room/lobby/lobby.routes';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +15,8 @@ import {AUTH_ROUTES_FULL} from '../auth.router';
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
-  authService = inject(AuthService);
+  private router = inject(Router);
+  private authService = inject(AuthService);
   isSubmitting = signal(false);
 
   loginModel= signal<UserLoginRequest>({
@@ -39,6 +41,9 @@ export class LoginComponent {
 
     try {
       const user = await this.authService.login(this.loginForm().value());
+      if (user) {
+        this.router.navigate([LOBBY_ROUTES_FULL.LOBBY]);
+      }
     } catch (err) {
       console.error('Login error', err);
     } finally {

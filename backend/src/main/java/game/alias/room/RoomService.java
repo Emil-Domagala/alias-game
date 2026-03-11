@@ -2,6 +2,7 @@ package game.alias.room;
 
 import game.alias.auth.AuthUser;
 import game.alias.common.pagination.PaginationResult;
+import game.alias.common.pagination.QueryConfigModel;
 import game.alias.common.pagination.QueryFilter;
 import game.alias.room.domains.Room;
 import game.alias.room.domains.dto.RoomWithPlayers;
@@ -29,7 +30,7 @@ public interface RoomService {
 
     RoomWithUsers getRoomWithUsers(UUID roomId);
 
-    PaginationResult<Room> getRooms(Pageable pageable, List<QueryFilter> filters);
+    PaginationResult<Room> getRooms(Pageable pageable, List<QueryFilter> filters, String search, QueryConfigModel.QueryConfig config);
 
     Optional<Room> findRoomByPlayer(UUID id);
 }

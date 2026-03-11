@@ -2,6 +2,7 @@ package game.alias.room;
 
 import game.alias.auth.AuthUser;
 import game.alias.common.pagination.PaginationResult;
+import game.alias.common.pagination.QueryConfigModel;
 import game.alias.common.pagination.QueryFilter;
 import game.alias.player.PlayerService;
 import game.alias.player.domains.Player;
@@ -34,7 +35,7 @@ public class RoomServiceImpl implements RoomService{
     private final PlayerService playerService;
     private final StringRedisTemplate redisTemplate;
     private final RoomEventPublisher roomEventPublisher;
-    private final RoomSpecificationBuilder roomSpecificationBuilder;
+    private final RoomSpecificationBuilder<Room> roomSpecificationBuilder;
 
     /* --------------------------- ROOM FETCH --------------------------- */
 
@@ -53,11 +54,25 @@ public class RoomServiceImpl implements RoomService{
     }
 
     @Override
-    public PaginationResult<Room> getRooms(Pageable pageable, List<QueryFilter> filters) {
-        Specification<Room> spec = filters.stream()
-                        .map(roomSpecificationBuilder::buildFilterSpecification)
-                        .reduce(Specification::and)
-                        .orElse(null);
+    public PaginationResult<Room> getRooms(Pageable pageable, List<QueryFilter> filters, String search, QueryConfigModel.QueryConfig config) {
+        Specification<Room> spec = null;
+
+        if (filters != null && !filters.isEmpty()) {
+            spec = filters.stream()
+                    .map(roomSpecificationBuilder::buildFilterSpecification)
+                    .reduce(Specification::and)
+                    .orElse(null);
+        }
+
+        if (search != null && !search.isBlank() && config.search() != null) {
+            Specification<Room> searchSpec = config.search().fields()
+                    .stream()
+                    .map(field -> roomSpecificationBuilder.buildSearchSpecification(field, search))
+                    .reduce(Specification::or)
+                    .orElse(null);
+
+            spec = (spec == null) ? searchSpec : spec.and(searchSpec);
+        }
 
         Page<Room> page = roomRepository.findAll(spec, pageable);
 

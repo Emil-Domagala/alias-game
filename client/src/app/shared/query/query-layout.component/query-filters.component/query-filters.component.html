@@ -1,0 +1,12 @@
+<div class="filters-list">
+
+  @for(filter of filters(); track filter.field) {
+
+    <app-filter-field
+      [config]="filter"
+      (filterChange)="updateFilter($event)"
+    />
+
+  }
+
+</div>

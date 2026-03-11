@@ -45,18 +45,11 @@ public class QueryValidator {
         return PageRequest.of(page, size, sort);
     }
 
-    public static void validateFilters(
-            List<QueryFilter> filters,
-            QueryConfigModel.QueryConfig config
-    ) {
+    public static void validateFilters(List<QueryFilter> filters, QueryConfigModel.QueryConfig config) {
 
-        Map<String, QueryConfigModel.FilterConfig> allowedFilters =
-                config.filters()
+        Map<String, QueryConfigModel.FilterConfig> allowedFilters = config.filters()
                         .stream()
-                        .collect(Collectors.toMap(
-                                QueryConfigModel.FilterConfig::field,
-                                f -> f
-                        ));
+                        .collect(Collectors.toMap(QueryConfigModel.FilterConfig::field, f -> f));
 
         for (QueryFilter f : filters) {
 

@@ -1,5 +1,5 @@
 import {Component, effect, input} from '@angular/core';
-import {Room} from '../../room/room.interface';
+import {Room} from '../../room.interface';
 import {RoomsListItemComponent} from './rooms-list-item/rooms-list-item.component';
 
 @Component({

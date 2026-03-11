@@ -1,0 +1,62 @@
+<div class="filter-field">
+
+  <label class="filter-field__label">
+    {{ label() }}
+  </label>
+
+  <div class="filter-field__controls">
+
+    <select
+      class="input filter-field__operator"
+      [(ngModel)]="operator"
+      (change)="apply()"
+    >
+      @for(op of config().operators; track op) {
+        <option [value]="op">
+          {{ operatorLabels[op] }}
+        </option>
+      }
+    </select>
+
+    @switch(config().type) {
+
+      @case(FilterType.TEXT) {
+        <input
+          class="input filter-field__value"
+          type="text"
+          [(ngModel)]="value"
+          (input)="apply()"
+          placeholder="Enter value"
+        />
+      }
+
+      @case(FilterType.NUMBER) {
+        <input
+          class="input filter-field__value"
+          type="number"
+          [(ngModel)]="value"
+          (input)="apply()"
+          placeholder="Enter number"
+        />
+      }
+
+      @case(FilterType.SELECT) {
+        <select
+          class="input filter-field__value"
+          [(ngModel)]="value"
+          (change)="apply()"
+        >
+          <option value="">All</option>
+
+          @for(opt of config().options; track opt) {
+            <option [value]="opt">{{opt}}</option>
+          }
+
+        </select>
+      }
+
+    }
+
+  </div>
+
+</div>

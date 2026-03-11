@@ -4,7 +4,7 @@ import { ApiService, API } from '../api.service';
 import { PaginationResult } from '../pagination-result.interface';
 import {RoomDto} from './roomDto.interface';
 import {HttpParams} from '@angular/common/http';
-import {QueryConfig, QueryFilter} from '../shared/query-config/query-config-model.model';
+import {QueryConfig, QueryFilter} from '../shared/query/query-config-model.model';
 
 @Injectable({
   providedIn: 'root',
@@ -42,7 +42,7 @@ export class RoomService {
     }
   }
 
-  async getRooms(params?: { page?: number; size?: number; sortField?: string; direction?: 'ASC' | 'DESC', filters?: QueryFilter[] }): Promise<PaginationResult<RoomDto> | null> {
+  async getRooms(params?: { page?: number; size?: number; sortField?: string; direction?: 'ASC' | 'DESC', filters?: QueryFilter[], search?: string }): Promise<PaginationResult<RoomDto> | null> {
     try {
       let httpParams = new HttpParams();
       if (params?.page != null) httpParams = httpParams.set('page', params.page);
@@ -53,6 +53,7 @@ export class RoomService {
           httpParams = httpParams.append('filters', `${f.field}:${f.operator}:${f.value}`)
         })
       }
+      if (params?.search) httpParams = httpParams.set('search', params.search);
 
       const res = await firstValueFrom(this.api.get<PaginationResult<RoomDto>>(`${API.V1.PRIVATE}/room`, httpParams));
       this._rooms.set(res.data.content);
@@ -84,6 +85,7 @@ export class RoomService {
   }
 
   async getCurrentRoom(): Promise<RoomDto | null> {
+    if (this._currentRoom()) return this._currentRoom();
     try {
       const res = await firstValueFrom(
         this.api.get<RoomDto>(`${API.V1.PRIVATE}/room/current`)

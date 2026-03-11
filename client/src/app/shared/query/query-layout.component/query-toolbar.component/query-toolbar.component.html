@@ -1,0 +1,60 @@
+<div class="toolbar-inner">
+
+  <!-- Search input only if config has search -->
+  @if(config().search) {
+    <div class="toolbar-control search-control">
+      <label class="toolbar-label" for="searchInput">Search</label>
+      <input
+        id="searchInput"
+        type="text"
+        class="input search"
+        [placeholder]="config().search!.placeholder || 'Search...'"
+        (input)="search($event)"
+      />
+    </div>
+  }
+
+  <!-- Sort field selector -->
+  <div class="toolbar-control">
+    <label class="toolbar-label" for="sortFieldSelect">Sort by</label>
+    <select
+      id="sortFieldSelect"
+      class="input"
+      (change)="sort($event)"
+    >
+      @for(field of config().sorting.sortFields; track field.label) {
+        <option [value]="field.field">{{field.label}}</option>
+      }
+    </select>
+  </div>
+
+  <!-- Sort direction button -->
+  <div class="toolbar-control">
+    <label class="toolbar-label" for="sortDirectionBtn">Sort direction</label>
+    <button
+      id="sortDirectionBtn"
+      class="btn btn-secondary"
+      (click)="toggleDirection()"
+    >
+      {{state.direction()}}
+    </button>
+  </div>
+
+  <!-- Page size selector -->
+  @if(config().pageSizes.length) {
+    <div class="toolbar-control">
+      <label class="toolbar-label" for="pageSizeSelect">Page size</label>
+      <select
+        id="pageSizeSelect"
+        class="input"
+        [value]="state.pageSize()"
+        (change)="changePageSize($event)"
+      >
+        @for(size of config().pageSizes; track size) {
+          <option [value]="size">{{size}}</option>
+        }
+      </select>
+    </div>
+  }
+
+</div>

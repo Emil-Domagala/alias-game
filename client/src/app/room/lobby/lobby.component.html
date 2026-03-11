@@ -1,0 +1,11 @@
+<div class="container">
+  @if(config()) {
+    <app-query-layout [config]="config()!">
+      <button (click)="openCreateRoomModal()" >Create Room</button>
+      <app-rooms-list [rooms]="rooms()" />
+    </app-query-layout>
+  }
+</div>
+
+
+
