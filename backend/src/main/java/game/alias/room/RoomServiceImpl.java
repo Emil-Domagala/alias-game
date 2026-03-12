@@ -35,7 +35,7 @@ public class RoomServiceImpl implements RoomService{
     private final PlayerService playerService;
     private final StringRedisTemplate redisTemplate;
     private final RoomEventPublisher roomEventPublisher;
-    private final RoomSpecificationBuilder<Room> roomSpecificationBuilder;
+    private final SpecificationBuilder<Room> specificationBuilder;
 
     /* --------------------------- ROOM FETCH --------------------------- */
 
@@ -59,7 +59,7 @@ public class RoomServiceImpl implements RoomService{
 
         if (filters != null && !filters.isEmpty()) {
             spec = filters.stream()
-                    .map(roomSpecificationBuilder::buildFilterSpecification)
+                    .map(specificationBuilder::buildFilterSpecification)
                     .reduce(Specification::and)
                     .orElse(null);
         }
@@ -67,7 +67,7 @@ public class RoomServiceImpl implements RoomService{
         if (search != null && !search.isBlank() && config.search() != null) {
             Specification<Room> searchSpec = config.search().fields()
                     .stream()
-                    .map(field -> roomSpecificationBuilder.buildSearchSpecification(field, search))
+                    .map(field -> specificationBuilder.buildSearchSpecification(field, search))
                     .reduce(Specification::or)
                     .orElse(null);
 

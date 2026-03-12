@@ -10,22 +10,34 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
-public class RoomSpecificationBuilder<T> {
+public class SpecificationBuilder<T> {
 
     public Specification<T> buildFilterSpecification(QueryFilter filter) {
         return (root, query, cb) -> {
 
             var path = root.get(filter.field());
             var javaType = path.getJavaType();
+            Object value = parseValue(javaType, filter.value());
 
             return switch (filter.operator()) {
-                case EQ -> cb.equal(path.as(javaType), parseValue(javaType, filter.value()));
+
+                case EQ -> cb.equal(path, value);
+
                 case CONTAINS -> {
                     Expression<String> stringPath = path.as(String.class);
                     yield cb.like(cb.lower(stringPath), "%" + filter.value().toLowerCase() + "%");
                 }
-                case LT -> cb.lessThan(path.as(Comparable.class), (Comparable) parseValue(javaType, filter.value()));
-                case GT -> cb.greaterThan(path.as(Comparable.class), (Comparable) parseValue(javaType, filter.value()));
+
+                case LT -> cb.lessThan(
+                        (Expression<? extends Comparable>) path.as(Comparable.class),
+                        (Comparable) value
+                );
+
+                case GT -> cb.greaterThan(
+                        (Expression<? extends Comparable>) path.as(Comparable.class),
+                        (Comparable) value
+                );
+
                 case IN -> {
                     List<Object> values = Arrays.stream(filter.value().split(","))
                             .map(v -> parseValue(javaType, v))
@@ -41,11 +53,16 @@ public class RoomSpecificationBuilder<T> {
         if (type.equals(Integer.class) || type.equals(int.class)) return Integer.parseInt(value);
         if (type.equals(Long.class) || type.equals(long.class)) return Long.parseLong(value);
         if (type.equals(Boolean.class) || type.equals(boolean.class)) return Boolean.parseBoolean(value);
-        if (type.isEnum()) return Enum.valueOf((Class<Enum>) type, value);
+
+        if (type.isEnum()) {
+            return Enum.valueOf((Class<Enum>) type, value);
+        }
+
         throw new IllegalArgumentException("Unsupported type: " + type.getName());
     }
 
     public Specification<Room> buildSearchSpecification(String field, String value) {
-        return (root, query, cb) -> cb.like(cb.lower(root.get(field)), "%" + value.toLowerCase() + "%");
+        return (root, query, cb) ->
+                cb.like(cb.lower(root.get(field)), "%" + value.toLowerCase() + "%");
     }
 }

@@ -77,7 +77,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
     const currentRoom = await this.service.getCurrentRoom();
     if (currentRoom) {
       console.log('User is already in a room:', currentRoom);
-      this.router.navigate(['/room', currentRoom.id]);
+      // this.router.navigate(['/room', currentRoom.id]);
     }
   }
 

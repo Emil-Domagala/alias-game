@@ -55,16 +55,16 @@ public class RoomController {
     @GetMapping()
     public ResponseEntity<PaginationResult<RoomDto>>getRooms(
             Pageable pageable,
-            @RequestParam(required = false) List<String> filter,
+            @RequestParam(required = false) List<String> filters,
             @RequestParam(required = false) String search
     ){
         QueryConfigModel.QueryConfig config = queryConfigProvider.getConfig();
-        List<QueryFilter> filters = filter != null ? FilterParser.parse(filter) : List.of();
+        List<QueryFilter> filterList = filters != null ? FilterParser.parse(filters) : List.of();
 
         Pageable validatedPageable = QueryValidator.validatePageable(pageable, config);
-        QueryValidator.validateFilters(filters, config);
+        QueryValidator.validateFilters(filterList, config);
 
-        PaginationResult<Room> paginatedRooms = service.getRooms(validatedPageable, filters,  search, config);
+        PaginationResult<Room> paginatedRooms = service.getRooms(validatedPageable, filterList,  search, config);
         Set<UUID> ownersId = paginatedRooms.getContent().stream().map(Room::getOwnerId).collect(Collectors.toSet());
         Map<UUID, Player> ownersById = playerService.loadExistingPlayers(ownersId).stream().collect(Collectors.toMap(Player::getId, Function.identity()));
         List<RoomDto> roomDtos = paginatedRooms.getContent().stream().map(room->mapper.toRoomDto(room,ownersById.get(room.getOwnerId()))).toList();

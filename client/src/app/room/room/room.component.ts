@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { WebSocketService } from '../../web-socket.service';
 import {JsonPipe} from '@angular/common';
 import {StompSubscription} from '@stomp/stompjs';
+import {RoomService} from '../room.service';
 
 interface RoomEvent {
   type: string;
@@ -25,6 +26,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   roomEvents: RoomEvent[] = [];
   ws = inject(WebSocketService);
   route = inject(ActivatedRoute);
+  roomService = inject(RoomService);
 
   ngOnInit() {
     // Get room ID from route
@@ -49,7 +51,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   leaveRoom() {
     // Example: send leave request to backend
     console.log(`Leaving room ${this.roomId}`);
-    // e.g., roomService.leaveRoom(this.roomId, user)
+    this.roomService.leaveRoom(this.roomId)
   }
 
   ngOnDestroy() {
