@@ -5,6 +5,7 @@ import { PaginationResult } from '../pagination-result.interface';
 import {RoomDto} from './roomDto.interface';
 import {HttpParams} from '@angular/common/http';
 import {QueryConfig, QueryFilter} from '../shared/query/query-config-model.model';
+import {mapApiError} from '../api-error.model';
 
 @Injectable({
   providedIn: 'root',
@@ -18,6 +19,16 @@ export class RoomService {
   private _rooms = signal<RoomDto[]>([]);
   rooms = this._rooms.asReadonly();
 
+  /**
+   * Fetches query configuration for rooms.
+   *
+   * The configuration describes which fields are filterable,
+   * searchable, and sortable when querying rooms.
+   *
+   * @returns A {@link QueryConfig} describing available filters and sorting options.
+   *
+   * @throws {ApiError}
+   */
   async getRoomConfig(): Promise<QueryConfig | null> {
     try {
       const res = await firstValueFrom(
@@ -26,22 +37,50 @@ export class RoomService {
 
       return res.data;
     } catch (e) {
-      console.error('Failed to fetch room config', e);
-      return null;
+      throw mapApiError(e);
     }
   }
 
+  /**
+   * Creates a new room.
+   *
+   * On success, the created room becomes the current room.
+   *
+   * @param data Room creation payload.
+   *
+   * @returns The created {@link RoomDto}.
+   *
+   * @throws {ApiError}
+   */
   async createRoom(data: any): Promise<RoomDto | null> {
     try {
       const res = await firstValueFrom(this.api.post<RoomDto>(`${API.V1.PRIVATE}/room/create`, data));
       this._currentRoom.set(res.data);
       return res.data;
     } catch (e) {
-      console.error('Failed to create room', e);
-      return null;
+      throw mapApiError(e);
     }
   }
 
+  /**
+   * Fetches a paginated list of rooms.
+   *
+   * Supports pagination, sorting, filtering, and full-text search.
+   *
+   * The internal `rooms` signal is updated with the returned room list.
+   *
+   * @param params Optional query parameters.
+   * @param params.page Page index (0-based).
+   * @param params.size Page size.
+   * @param params.sortField Field used for sorting.
+   * @param params.direction Sort direction (`ASC` or `DESC`).
+   * @param params.filters Optional query filters.
+   * @param params.search Optional search string.
+   *
+   * @returns A {@link PaginationResult} containing rooms and metadata.
+   *
+   * @throws {ApiError}
+   */
   async getRooms(params?: { page?: number; size?: number; sortField?: string; direction?: 'ASC' | 'DESC', filters?: QueryFilter[], search?: string }): Promise<PaginationResult<RoomDto> | null> {
     try {
       let httpParams = new HttpParams();
@@ -59,31 +98,58 @@ export class RoomService {
       this._rooms.set(res.data.content);
       return res.data;
     } catch (e) {
-      console.error('Failed to fetch rooms', e);
-      return null;
+      throw mapApiError(e);
     }
   }
 
+  /**
+   * Joins an existing room.
+   *
+   * On success, the joined room becomes the current room.
+   *
+   * @param roomId Identifier of the room to join.
+   *
+   * @returns The joined {@link RoomDto}.
+   *
+   * @throws {ApiError}
+   */
   async joinRoom(roomId: string): Promise<RoomDto | null> {
     try {
       const res = await firstValueFrom(this.api.post<RoomDto>(`${API.V1.PRIVATE}/room/${roomId}/join`, {}));
       this._currentRoom.set(res.data);
       return res.data;
     } catch (e) {
-      console.error('Failed to join room', e);
-      return null;
+      throw mapApiError(e);
     }
   }
 
+  /**
+   * Leaves the specified room.
+   *
+   * After a successful request, the current room signal is cleared.
+   *
+   * @param roomId Identifier of the room to leave.
+   *
+   * @throws {ApiError}
+   */
   async leaveRoom(roomId: string): Promise<void> {
     try {
       await firstValueFrom(this.api.post<void>(`${API.V1.PRIVATE}/room/${roomId}/leave`, {}));
       this._currentRoom.set(null);
     } catch (e) {
-      console.error('Failed to leave room', e);
+      throw mapApiError(e);
     }
   }
 
+  /**
+   * Retrieves the current room from the backend if it is not already cached.
+   *
+   * If a room is already present in the local signal, the cached value is returned.
+   *
+   * @returns The current {@link RoomDto}, or `null` if the user is not in a room.
+   *
+   * @throws {ApiError}
+   */
   async getCurrentRoom(): Promise<RoomDto | null> {
     if (this._currentRoom()) return this._currentRoom();
     try {
@@ -93,9 +159,8 @@ export class RoomService {
       this._currentRoom.set(res.data ?? null);
       return res.data ?? null;
     } catch (e) {
-      console.warn('User is not in any room', e);
       this._currentRoom.set(null);
-      return null;
+      throw mapApiError(e);
     }
   }
 
