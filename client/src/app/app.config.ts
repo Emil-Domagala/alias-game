@@ -14,6 +14,8 @@ export const appConfig: ApplicationConfig = {
     provideStore(),
     provideAnimationsAsync(),
     provideToastr({
+      newestOnTop: true,
+      preventDuplicates: true,
       positionClass: 'toast-top-right',
       timeOut: 3000
     })

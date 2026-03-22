@@ -5,7 +5,7 @@ import {
   min,
   max,
   minLength,
-  maxLength, FormField
+  maxLength, FormField, submit
 } from '@angular/forms/signals';
 import { RoomService } from '../room.service';
 import { CreateRoomRequest } from './CreateRoomRequest.interface';
@@ -13,6 +13,9 @@ import { FormFieldComponent } from '../../shared/form/form-field/form-field.comp
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { FormsModule } from '@angular/forms';
 import { RoomDto } from '../roomDto.interface';
+import {ApiErrorMapperService} from '../../shared/form/api-error-mapper.service';
+import {ToastrService} from 'ngx-toastr';
+import {ApiError} from '../../api-error.model';
 
 @Component({
   selector: 'app-create-room-modal',
@@ -23,6 +26,8 @@ import { RoomDto } from '../roomDto.interface';
 export class CreateRoomModalComponent {
   private dialogRef = inject(DialogRef);
   data = inject(DIALOG_DATA);
+  private apiErrorMapper = inject(ApiErrorMapperService);
+  private toastr = inject(ToastrService);
 
   close(result?: any) {
     this.dialogRef.close(result);
@@ -58,22 +63,26 @@ export class CreateRoomModalComponent {
   });
 
   /** Submit form and create room */
-  async submit() {
-    if (this.createRoom().invalid()) return;
+  async onSubmit(event: Event) {
+    event.preventDefault();
 
-    const payload = this.createRoom().value();
-    console.log('Create room payload:', payload);
+    await submit(this.createRoom, async (form) => {
+      try {
+        const room: RoomDto | null = await this.service.createRoom(form().value());
 
-    try {
-      const room: RoomDto | null = await this.service.createRoom(payload);
-      if (room) {
-        console.log('Room created successfully:', room);
-        this.close(room);
-      } else {
-        console.warn('Room creation failed');
+        if (room) {
+          this.toastr.success('Room created!');
+          this.close(room);
+        }
+
+        return;
+      } catch (err) {
+        const apiError = err as ApiError;
+
+        this.toastr.error(apiError.message, 'Creation failed');
+
+        return this.apiErrorMapper.mapApiErrorToValidationErrors(apiError, form);
       }
-    } catch (err) {
-      console.error('Failed to create room', err);
-    }
+    });
   }
 }

@@ -1,12 +1,25 @@
 import {Component, inject, signal} from '@angular/core';
 import {UserLoginRequest} from './UserLoginRequest.interface';
-import {email, form, FormField, maxLength, minLength, required} from '@angular/forms/signals';
+import {
+  email,
+  FieldTree,
+  form,
+  FormField,
+  maxLength,
+  minLength,
+  required,
+  submit,
+  ValidationError
+} from '@angular/forms/signals';
 import {USER_CONSTRAINTS} from '../user.constraints';
 import {FormFieldComponent} from '../../shared/form/form-field/form-field.component';
 import {Router, RouterLink} from '@angular/router';
 import {AuthService} from '../auth.service';
 import {AUTH_ROUTES_FULL} from '../auth.routes';
 import {LOBBY_ROUTES_FULL} from '../../room/lobby/lobby.routes';
+import { ToastrService } from 'ngx-toastr';
+import {ApiError} from '../../api-error.model';
+import {ApiErrorMapperService} from '../../shared/form/api-error-mapper.service';
 
 @Component({
   selector: 'app-login',
@@ -17,7 +30,8 @@ import {LOBBY_ROUTES_FULL} from '../../room/lobby/lobby.routes';
 export class LoginComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
-  isSubmitting = signal(false);
+  private toastrService = inject(ToastrService);
+  private apiErrorMapperService = inject(ApiErrorMapperService);
 
   loginModel= signal<UserLoginRequest>({
     email:'',
@@ -32,23 +46,24 @@ export class LoginComponent {
     maxLength(shemaPath.password,USER_CONSTRAINTS.PASSWORD_MAX,{ message: "Password is too long"});
   })
 
-  async submit(event: Event) {
+  async onSubmit(event: Event) {
     event.preventDefault();
 
-    if (this.loginForm().invalid()) return;
+    await submit(this.loginForm, async (form) => {
+      try {
+        const user = await this.authService.login(form().value());
 
-    this.isSubmitting.set(true);
+        if (user) {
+          this.toastrService.success('Welcome back!');
+          await this.router.navigate([LOBBY_ROUTES_FULL.LOBBY]);
+        }
 
-    try {
-      const user = await this.authService.login(this.loginForm().value());
-      if (user) {
-        this.router.navigate([LOBBY_ROUTES_FULL.LOBBY]);
-      }
-    } catch (err) {
-      console.error('Login error', err);
-    } finally {
-      this.isSubmitting.set(false);
-    }
+        return undefined;
+      } catch (err) {
+        const apiError = err as ApiError;
+        this.toastrService.error(apiError.message, 'Login failed');
+        return this.apiErrorMapperService.mapApiErrorToValidationErrors(apiError, this.loginForm);
+    }});
   }
 
   protected readonly AUTH_ROUTES_FULL = AUTH_ROUTES_FULL;

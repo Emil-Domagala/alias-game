@@ -1,6 +1,6 @@
 <h1>Register</h1>
 
-<form (submit)="submit($event)">
+<form (submit)="onSubmit($event)">
   <app-form-field
     label="Email"
     forId="email"
@@ -39,12 +39,13 @@
     />
   </app-form-field>
 
+<!--  TODO: Add Submitting Button-->
   <button
     type="submit"
-    [disabled]="registerForm().invalid()"
+    [disabled]="registerForm().invalid() || registerForm().submitting()"
     class="btn btn-primary"
   >
-    Register
+    {{ registerForm().submitting() ? 'Registering...' : 'Register' }}
   </button>
 
   <p class="auth-switch">

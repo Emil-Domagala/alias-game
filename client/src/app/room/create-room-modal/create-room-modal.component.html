@@ -1,6 +1,6 @@
 <h1>Create room</h1>
 
-<form (ngSubmit)="submit()">
+<form (ngSubmit)="onSubmit($event)">
   <app-form-field
     label="Room name"
     forId="name"

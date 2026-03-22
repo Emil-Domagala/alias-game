@@ -35,7 +35,8 @@ public class CookieAuthFilter extends OncePerRequestFilter {
     public CookieAuthFilter(
             JwtService jwtService,
             RedisAuthUserService redisAuthService,
-            @Qualifier("handlerExceptionResolver") HandlerExceptionResolver exceptionResolver, AuthCookieService authCookieService
+            @Qualifier("handlerExceptionResolver") HandlerExceptionResolver exceptionResolver,
+            AuthCookieService authCookieService
     ) {
         this.jwtService = jwtService;
         this.redisAuthService = redisAuthService;

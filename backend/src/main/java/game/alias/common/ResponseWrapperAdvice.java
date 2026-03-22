@@ -19,7 +19,7 @@ public class ResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-        return !returnType.getContainingClass().getPackageName().startsWith("org.springdoc");
+        return true;
     }
 
     @Nullable

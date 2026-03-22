@@ -1,5 +1,5 @@
 import { Component, inject, signal} from '@angular/core';
-import {form, required, email, minLength, maxLength, FormField} from '@angular/forms/signals';
+import {form, required, email, minLength, maxLength, FormField, submit} from '@angular/forms/signals';
 import {UserRegisterRequest} from './UserRegisterRequest.interface';
 import {USER_CONSTRAINTS} from '../user.constraints';
 import {CommonModule} from '@angular/common';
@@ -8,6 +8,9 @@ import {Router, RouterLink} from '@angular/router';
 import {AuthService} from '../auth.service';
 import {AUTH_ROUTES_FULL} from '../auth.routes';
 import {LOBBY_ROUTES_FULL} from '../../room/lobby/lobby.routes';
+import {ToastrService} from 'ngx-toastr';
+import {ApiErrorMapperService} from '../../shared/form/api-error-mapper.service';
+import {ApiError} from '../../api-error.model';
 
 @Component({
   selector: 'app-register',
@@ -18,7 +21,8 @@ import {LOBBY_ROUTES_FULL} from '../../room/lobby/lobby.routes';
 export class RegisterComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
-  isSubmitting = signal(false);
+  private toastrService = inject(ToastrService);
+  private apiErrorMapperService = inject(ApiErrorMapperService);
 
   registerModel = signal<UserRegisterRequest>({
     email: '',
@@ -37,23 +41,29 @@ export class RegisterComponent {
     maxLength(shemaPath.nick,USER_CONSTRAINTS.NICK_MAX,{ message: "Nick is too long"});
   })
 
-  async submit(event: Event) {
+  async onSubmit(event: Event) {
     event.preventDefault();
 
-    if (this.registerForm().invalid()) return;
+    event.preventDefault();
 
-    this.isSubmitting.set(true);
+    await submit(this.registerForm, async (form) => {
+      try {
+        const user = await this.authService.register(form().value());
 
-    try {
-      const user = await this.authService.register(this.registerForm().value());
-      if (user) {
-        this.router.navigate([LOBBY_ROUTES_FULL.LOBBY]);
+        if (user) {
+          this.toastrService.success('Account created!');
+          await this.router.navigate([LOBBY_ROUTES_FULL.LOBBY]);
+        }
+
+        return;
+      } catch (err) {
+        const apiError = err as ApiError;
+
+        this.toastrService.error(apiError.message, 'Registration failed');
+
+        return this.apiErrorMapperService.mapApiErrorToValidationErrors(apiError, form);
       }
-    } catch (err) {
-      console.error('Registration error', err);
-    } finally {
-      this.isSubmitting.set(false);
-    }
+    });
   }
 
   protected readonly AUTH_ROUTES_FULL = AUTH_ROUTES_FULL;
