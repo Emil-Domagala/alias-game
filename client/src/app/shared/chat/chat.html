@@ -1,0 +1,41 @@
+<div class="chat-container">
+  <div class="chat-messages">
+    @for (msg of messages(); track msg.id){
+    <div
+      class="chat-message"
+      [class.self]="msg.sender?.id === currentUser()?.id">
+      <span class="chat-sender">{{ msg.sender?.nick || 'System' }}:</span>
+      <span class="chat-content">{{ msg.content }}</span>
+    </div>
+    }
+  </div>
+
+  @if (mentionSuggestions().length > 0) {
+  <div class="mention-suggestions" >
+    @for (player of mentionSuggestions(); track player.id){
+    <div
+      class="mention-item"
+      (click)="selectMention(player)">
+      {{ player.nick }}
+    </div>
+    }
+  </div>
+  }
+  <!-- Input area -->
+  <form (submit)="submitMessage(); $event.preventDefault()" class="chat-input-form">
+    <input
+      type="text"
+      class="chat-input"
+      placeholder="Type a message..."
+      [value]="newMessage()"
+      (input)="newMessage.set($any($event.target).value); onInputChange()"
+      autofocus/>
+    <button
+      type="submit"
+      class="btn btn-primary chat-send-btn"
+      [disabled]="!newMessage().trim()"
+    >
+      Send
+    </button>
+  </form>
+</div>

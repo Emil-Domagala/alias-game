@@ -4,12 +4,12 @@ import { CreateRoomModalComponent } from '../create-room-modal/create-room-modal
 import { RoomService } from '../room.service';
 import { ModalService } from '../../shared/modal/modal.service';
 import { RoomsListComponent } from './rooms-list/rooms-list.component';
-import { RoomDto } from '../roomDto.interface';
 import { WebSocketService } from '../../web-socket.service';
 import {QueryConfig} from '../../shared/query/query-config-model.model';
 import {Router} from '@angular/router';
 import {QueryLayoutComponent} from '../../shared/query/query-layout.component/query-layout.component';
 import {QueryStateService} from '../../shared/query/query-state.service';
+import {Room} from '../room.interface';
 
 @Component({
   selector: 'app-lobby',
@@ -26,7 +26,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   private wsSub?: StompSubscription;
 
-  rooms = signal<RoomDto[]>([]);
+  rooms = signal<Room[]>([]);
   config = signal<QueryConfig | null>(null);
 
   ngOnInit() {
@@ -77,7 +77,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
     const currentRoom = await this.service.getCurrentRoom();
     if (currentRoom) {
       console.log('User is already in a room:', currentRoom);
-      // this.router.navigate(['/room', currentRoom.id]);
+      this.router.navigate(['/room', currentRoom.id]);
     }
   }
 

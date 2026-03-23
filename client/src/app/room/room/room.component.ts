@@ -1,9 +1,11 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import {Component, OnDestroy, OnInit, inject, signal} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { WebSocketService } from '../../web-socket.service';
 import {JsonPipe} from '@angular/common';
 import {StompSubscription} from '@stomp/stompjs';
 import {RoomService} from '../room.service';
+import {Chat} from '../../shared/chat/chat';
+import {ConversationType} from '../../shared/message.interface';
 
 interface RoomEvent {
   type: string;
@@ -15,7 +17,8 @@ interface RoomEvent {
   standalone: true,
   templateUrl: './room.component.html',
   imports: [
-    JsonPipe
+    JsonPipe,
+    Chat
   ],
   styleUrls: ['./room.component.scss']
 })
@@ -27,6 +30,9 @@ export class RoomComponent implements OnInit, OnDestroy {
   ws = inject(WebSocketService);
   route = inject(ActivatedRoute);
   roomService = inject(RoomService);
+  room = this.roomService.currentRoom
+  teams = signal<any[]>([]);
+  protected messages: any;
 
   ngOnInit() {
     // Get room ID from route
@@ -59,4 +65,11 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.wsSub?.unsubscribe();
     this.ws.disconnect();
   }
+
+  protected handleSendMessage($event: any) {
+
+  }
+
+
+  protected readonly ConversationType = ConversationType;
 }

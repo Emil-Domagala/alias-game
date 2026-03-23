@@ -54,7 +54,6 @@ export class LoginComponent {
         const user = await this.authService.login(form().value());
 
         if (user) {
-          this.toastrService.success('Welcome back!');
           await this.router.navigate([LOBBY_ROUTES_FULL.LOBBY]);
         }
 

@@ -1,11 +1,11 @@
-import { Injectable, inject, signal } from '@angular/core';
+import {Injectable, inject, signal, WritableSignal, Signal} from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { ApiService, API } from '../api.service';
 import { PaginationResult } from '../pagination-result.interface';
-import {RoomDto} from './roomDto.interface';
 import {HttpParams} from '@angular/common/http';
 import {QueryConfig, QueryFilter} from '../shared/query/query-config-model.model';
 import {mapApiError} from '../api-error.model';
+import {Room} from './room.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -13,10 +13,10 @@ import {mapApiError} from '../api-error.model';
 export class RoomService {
   private api = inject(ApiService);
 
-  private _currentRoom = signal<RoomDto | null>(null);
-  currentRoom = this._currentRoom.asReadonly();
+  private _currentRoom = signal<Room | null>(null);
+  currentRoom: Signal<Room | null> = this._currentRoom.asReadonly();
 
-  private _rooms = signal<RoomDto[]>([]);
+  private _rooms = signal<Room[]>([]);
   rooms = this._rooms.asReadonly();
 
   /**
@@ -48,13 +48,13 @@ export class RoomService {
    *
    * @param data Room creation payload.
    *
-   * @returns The created {@link RoomDto}.
+   * @returns The created {@link Room}.
    *
    * @throws {ApiError}
    */
-  async createRoom(data: any): Promise<RoomDto | null> {
+  async createRoom(data: any): Promise<Room | null> {
     try {
-      const res = await firstValueFrom(this.api.post<RoomDto>(`${API.V1.PRIVATE}/room/create`, data));
+      const res = await firstValueFrom(this.api.post<Room>(`${API.V1.PRIVATE}/room/create`, data));
       this._currentRoom.set(res.data);
       return res.data;
     } catch (e) {
@@ -81,7 +81,7 @@ export class RoomService {
    *
    * @throws {ApiError}
    */
-  async getRooms(params?: { page?: number; size?: number; sortField?: string; direction?: 'ASC' | 'DESC', filters?: QueryFilter[], search?: string }): Promise<PaginationResult<RoomDto> | null> {
+  async getRooms(params?: { page?: number; size?: number; sortField?: string; direction?: 'ASC' | 'DESC', filters?: QueryFilter[], search?: string }): Promise<PaginationResult<Room> | null> {
     try {
       let httpParams = new HttpParams();
       if (params?.page != null) httpParams = httpParams.set('page', params.page);
@@ -94,7 +94,7 @@ export class RoomService {
       }
       if (params?.search) httpParams = httpParams.set('search', params.search);
 
-      const res = await firstValueFrom(this.api.get<PaginationResult<RoomDto>>(`${API.V1.PRIVATE}/room`, httpParams));
+      const res = await firstValueFrom(this.api.get<PaginationResult<Room>>(`${API.V1.PRIVATE}/room`, httpParams));
       this._rooms.set(res.data.content);
       return res.data;
     } catch (e) {
@@ -109,13 +109,13 @@ export class RoomService {
    *
    * @param roomId Identifier of the room to join.
    *
-   * @returns The joined {@link RoomDto}.
+   * @returns The joined {@link Room}.
    *
    * @throws {ApiError}
    */
-  async joinRoom(roomId: string): Promise<RoomDto | null> {
+  async joinRoom(roomId: string): Promise<Room | null> {
     try {
-      const res = await firstValueFrom(this.api.post<RoomDto>(`${API.V1.PRIVATE}/room/${roomId}/join`, {}));
+      const res = await firstValueFrom(this.api.post<Room>(`${API.V1.PRIVATE}/room/${roomId}/join`, {}));
       this._currentRoom.set(res.data);
       return res.data;
     } catch (e) {
@@ -146,15 +146,15 @@ export class RoomService {
    *
    * If a room is already present in the local signal, the cached value is returned.
    *
-   * @returns The current {@link RoomDto}, or `null` if the user is not in a room.
+   * @returns The current {@link Room}, or `null` if the user is not in a room.
    *
    * @throws {ApiError}
    */
-  async getCurrentRoom(): Promise<RoomDto | null> {
+  async getCurrentRoom(): Promise<Room | null> {
     if (this._currentRoom()) return this._currentRoom();
     try {
       const res = await firstValueFrom(
-        this.api.get<RoomDto>(`${API.V1.PRIVATE}/room/current`)
+        this.api.get<Room>(`${API.V1.PRIVATE}/room/current`)
       );
       this._currentRoom.set(res.data ?? null);
       return res.data ?? null;
@@ -164,7 +164,7 @@ export class RoomService {
     }
   }
 
-  setCurrentRoom(room: RoomDto) {
+  setCurrentRoom(room: Room) {
     this._currentRoom.set(room);
   }
 }

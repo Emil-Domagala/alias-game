@@ -1,0 +1,145 @@
+.room {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--space-md);
+  gap: var(--space-md);
+}
+
+/* HEADER */
+
+.room-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--background-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+
+  .room-title {
+    font-size: var(--font-lg);
+    font-weight: 600;
+  }
+
+  .room-id {
+    font-size: var(--font-xs);
+    color: var(--text-muted);
+  }
+
+  .room-actions {
+    display: flex;
+    gap: var(--space-sm);
+  }
+}
+
+/* BODY */
+
+.room-body {
+  display: grid;
+  grid-template-columns: 280px 1fr 260px;
+  gap: var(--space-md);
+  flex: 1;
+  min-height: 0; // important for flex scroll
+}
+
+/* SIDEBARS */
+
+.room-sidebar-left,
+.room-sidebar-right {
+  background: var(--background-surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  box-shadow: var(--shadow-sm);
+  overflow-y: auto;
+}
+
+.section-title {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* TEAMS */
+
+.team {
+  background: var(--background-surface-secondary);
+  border-radius: var(--radius-sm);
+  padding: var(--space-xs);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+
+  .team-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--font-sm);
+    font-weight: 600;
+  }
+
+  .team-players {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xxs);
+
+    .player {
+      font-size: var(--font-xs);
+      color: var(--text-muted);
+    }
+  }
+}
+
+/* MAIN */
+
+.room-main {
+  background: var(--background-surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+/* RIGHT PANEL */
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.room-meta {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xxs);
+}
+
+/* UTIL */
+
+.full-width {
+  width: 100%;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1024px) {
+  .room-body {
+    grid-template-columns: 1fr;
+  }
+
+  .room-sidebar-left,
+  .room-sidebar-right {
+    order: 2;
+  }
+
+  .room-main {
+    order: 1;
+  }
+}

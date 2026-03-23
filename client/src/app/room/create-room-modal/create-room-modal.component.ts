@@ -12,10 +12,10 @@ import { CreateRoomRequest } from './CreateRoomRequest.interface';
 import { FormFieldComponent } from '../../shared/form/form-field/form-field.component';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { FormsModule } from '@angular/forms';
-import { RoomDto } from '../roomDto.interface';
 import {ApiErrorMapperService} from '../../shared/form/api-error-mapper.service';
 import {ToastrService} from 'ngx-toastr';
 import {ApiError} from '../../api-error.model';
+import {Room} from '../room.interface';
 
 @Component({
   selector: 'app-create-room-modal',
@@ -68,7 +68,7 @@ export class CreateRoomModalComponent {
 
     await submit(this.createRoom, async (form) => {
       try {
-        const room: RoomDto | null = await this.service.createRoom(form().value());
+        const room: Room | null = await this.service.createRoom(form().value());
 
         if (room) {
           this.toastr.success('Room created!');
