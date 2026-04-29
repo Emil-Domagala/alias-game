@@ -123,7 +123,4 @@ public class CookieAuthFilter extends OncePerRequestFilter {
             exceptionResolver.resolveException(request, response, null, new AuthException("Unknown error", e));
         }
     }
-
-
-
 }

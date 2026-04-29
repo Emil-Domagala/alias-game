@@ -4,7 +4,6 @@ import game.alias.user.domains.dto.UserDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,8 +32,7 @@ public class AuthPublicController {
     private final AuthCookieService authCookieService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserDto> register(@RequestBody @Valid UserRegisterRequest userRegisterRequest,
-                                            HttpServletResponse res) {
+    public ResponseEntity<UserDto> register(@RequestBody @Valid UserRegisterRequest userRegisterRequest, HttpServletResponse res) {
         log.debug("Registering user {}", userRegisterRequest.email());
 
         AuthResponse authRes = authService.register(userRegisterRequest);
@@ -50,9 +48,7 @@ public class AuthPublicController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserDto> login(
-            @RequestBody @Valid UserLoginRequest userLoginRequest,
-            HttpServletResponse res) {
+    public ResponseEntity<UserDto> login(@RequestBody @Valid UserLoginRequest userLoginRequest, HttpServletResponse res) {
 
         AuthResponse authRes = authService.login(userLoginRequest);
 

@@ -7,6 +7,8 @@ import game.alias.player.domains.dto.PlayerDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 public class MessageMapper {
@@ -28,10 +30,22 @@ public class MessageMapper {
                 message.getId(),
                 senderDto,
                 message.getConversationId(),
+                message.getTargetUserId(),
                 message.getContent(),
                 message.getConversationType(),
                 message.getMessageType(),
                 message.getCreatedAt()
+        );
+    }
+
+    public MessageSendConfirmationDto toMessageSendConfirmationDto(UUID tempId, Message message) {
+        if (tempId == null || message == null) return null;
+
+        return new MessageSendConfirmationDto(
+                message.getId(),
+                tempId,
+                message.getConversationType(),
+                message.getConversationId()
         );
     }
 }

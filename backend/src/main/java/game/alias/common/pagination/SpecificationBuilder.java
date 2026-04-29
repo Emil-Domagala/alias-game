@@ -1,6 +1,5 @@
-package game.alias.room;
+package game.alias.common.pagination;
 
-import game.alias.common.pagination.QueryFilter;
 import game.alias.room.domains.Room;
 import jakarta.persistence.criteria.Expression;
 import org.springframework.data.jpa.domain.Specification;

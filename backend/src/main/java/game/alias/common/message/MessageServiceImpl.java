@@ -31,18 +31,14 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Message createUserMessage(
-            UUID senderId,
-            UUID conversationId,
-            ConversationType conversationType,
-            String content
-    ) {
+    public Message createUserMessage(UUID senderId, ConversationType conversationType, MessageRequest messageRequest) {
         Message message = Message.builder()
                 .senderId(senderId)
-                .conversationId(conversationId)
+                .conversationId(messageRequest.conversationId())
                 .conversationType(conversationType)
                 .messageType(MessageType.USER)
-                .content(content)
+                .content(messageRequest.content())
+                .targetUserId(messageRequest.targetUserId())
                 .build();
 
         return repository.save(message);

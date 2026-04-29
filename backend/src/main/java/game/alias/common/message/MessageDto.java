@@ -10,6 +10,7 @@ public record MessageDto(
         UUID id,
         PlayerDto sender,
         UUID conversationId,
+        UUID targetUserId,
         String content,
         ConversationType conversationType,
         MessageType messageType,

@@ -2,6 +2,7 @@ package game.alias.room;
 
 import game.alias.auth.AuthUser;
 import game.alias.common.ApiVersion;
+import game.alias.common.currentUser.CurrentUser;
 import game.alias.common.pagination.*;
 import game.alias.player.domains.Player;
 import game.alias.room.domains.Room;
@@ -13,7 +14,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -38,7 +38,7 @@ public class RoomController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<RoomDto>createRoom(@Valid @RequestBody CreateRoomRequest request, @AuthenticationPrincipal AuthUser user){
+    public ResponseEntity<RoomDto>createRoom(@Valid @RequestBody CreateRoomRequest request, @CurrentUser AuthUser user){
         var room = service.create(request, user);
         var ownerPlayer = playerService.cashePlayer(user);
         var roomDto = mapper.toRoomDto(room, ownerPlayer);
@@ -47,7 +47,7 @@ public class RoomController {
     }
 
     @DeleteMapping("/{roomId}")
-    public ResponseEntity<Void>deleteRoom(@PathVariable UUID roomId, @AuthenticationPrincipal AuthUser user){
+    public ResponseEntity<Void>deleteRoom(@PathVariable UUID roomId, @CurrentUser AuthUser user){
         service.delete(roomId, user);
         return ResponseEntity.noContent().build();
     }
@@ -83,7 +83,7 @@ public class RoomController {
     }
 
     @PostMapping("/{roomId}/join")
-    public ResponseEntity<RoomDto>joinRoom(@PathVariable UUID roomId, @AuthenticationPrincipal AuthUser user){
+    public ResponseEntity<RoomDto>joinRoom(@PathVariable UUID roomId, @CurrentUser AuthUser user){
         Room room = service.joinRoom(roomId, user);
         Player currentPlayer = playerService.cashePlayer(user);
         RoomDto roomDto = mapper.toRoomDto(room, currentPlayer);
@@ -92,7 +92,7 @@ public class RoomController {
     }
 
     @PostMapping("/{roomId}/leave")
-    public ResponseEntity<RoomDto>leaveRoom(@PathVariable UUID roomId, @AuthenticationPrincipal AuthUser user){
+    public ResponseEntity<RoomDto>leaveRoom(@PathVariable UUID roomId, @CurrentUser AuthUser user){
         Room room = service.leaveRoom(roomId, user);
 
         // If user was owner and deleted room, room will no longer exist
@@ -107,7 +107,7 @@ public class RoomController {
     }
 
     @GetMapping("/current")
-    public ResponseEntity<RoomDto> getCurrentRoom(@AuthenticationPrincipal AuthUser user) {
+    public ResponseEntity<RoomDto> getCurrentRoom(@CurrentUser AuthUser user) {
         Optional<Room> roomOpt = service.findRoomByPlayer(user.getId());
 
         if (roomOpt.isEmpty()) {

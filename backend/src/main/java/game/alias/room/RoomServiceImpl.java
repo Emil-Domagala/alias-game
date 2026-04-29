@@ -1,6 +1,7 @@
 package game.alias.room;
 
 import game.alias.auth.AuthUser;
+import game.alias.common.pagination.SpecificationBuilder;
 import game.alias.common.pagination.PaginationResult;
 import game.alias.common.pagination.QueryConfigModel;
 import game.alias.common.pagination.QueryFilter;
