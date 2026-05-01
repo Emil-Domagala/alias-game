@@ -9,6 +9,7 @@ import java.util.UUID;
 import javax.crypto.SecretKey;
 
 import game.alias.auth.session.exceptions.AuthException;
+import game.alias.config.properties.SessionConfigProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -23,27 +24,25 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class JwtService {
-
-    @Value("${session.cookie.auth.maxAge}")
-    private Duration USER_TTL;
-
-    @Value("${session.jwt.secret}")
-    private String jwtSecret;
+    private final SessionConfigProperties sessionConfig;
 
     public String generateSessionToken(UUID sessionId) {
+        Duration ttl = sessionConfig.cookie().auth().maxAge();
+
         return Jwts.builder()
                 .subject(sessionId.toString())
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + USER_TTL.toMillis()))
+                .expiration(new Date(System.currentTimeMillis() + ttl.toMillis()))
                 .signWith(key())
                 .compact();
     }
 
     private Key key() {
-        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+        String secret = sessionConfig.jwt().secret();
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String validateAndGetSessionId(String token) throws AuthException {
+    public String validateAndGetSessionId(String token) throws JwtException, Exception {
         log.info("Token: " + token);
 
         try {

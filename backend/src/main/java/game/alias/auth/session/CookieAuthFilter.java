@@ -6,10 +6,10 @@ import java.util.UUID;
 
 import game.alias.auth.session.exceptions.AuthException;
 import game.alias.common.ApiVersion;
+import game.alias.config.properties.SessionConfigProperties;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,17 +31,20 @@ public class CookieAuthFilter extends OncePerRequestFilter {
     private final RedisAuthUserService redisAuthService;
     private final HandlerExceptionResolver exceptionResolver;
     private final AuthCookieService authCookieService;
+    private final SessionConfigProperties sessionConfig;
 
     public CookieAuthFilter(
             JwtService jwtService,
             RedisAuthUserService redisAuthService,
             @Qualifier("handlerExceptionResolver") HandlerExceptionResolver exceptionResolver,
-            AuthCookieService authCookieService
+            AuthCookieService authCookieService,
+            SessionConfigProperties sessionConfig
     ) {
         this.jwtService = jwtService;
         this.redisAuthService = redisAuthService;
         this.exceptionResolver = exceptionResolver;
         this.authCookieService = authCookieService;
+        this.sessionConfig = sessionConfig;
     }
 
     @Override
@@ -54,10 +57,9 @@ public class CookieAuthFilter extends OncePerRequestFilter {
                 || path.startsWith(ApiVersion.V1Public);
     }
 
-    @Value("${session.cookie.auth.name}")
-    private String authCookieName;
-
     private String extractCookieFromRequest(@NonNull HttpServletRequest request) {
+        String cookieName = sessionConfig.cookie().auth().name();
+
         if (request.getCookies() == null) {
             return null;
         }
@@ -65,7 +67,7 @@ public class CookieAuthFilter extends OncePerRequestFilter {
         log.info("Cookies: " + Arrays.toString(request.getCookies()));
 
         for (var cookie : request.getCookies()) {
-            if (cookie.getName().equals(authCookieName)) {
+            if (cookie.getName().equals(cookieName)) {
                 return cookie.getValue();
             }
         }

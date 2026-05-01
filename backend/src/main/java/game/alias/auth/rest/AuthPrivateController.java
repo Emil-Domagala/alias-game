@@ -1,5 +1,6 @@
 package game.alias.auth.rest;
 
+import game.alias.auth.session.resolver.AuthSessionIdCookieValue;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -22,7 +23,7 @@ public class AuthPrivateController {
     private final AuthCookieService authCookieService;
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@CookieValue(name = "${session.cookie.auth.name}", required = true) String sessionId, HttpServletResponse res) {
+    public ResponseEntity<Void> logout(@AuthSessionIdCookieValue String sessionId, HttpServletResponse res) {
         authService.logout(sessionId);
 
         return ResponseEntity.noContent().header(HttpHeaders.SET_COOKIE, authCookieService.clear().toString()).build();

@@ -1,5 +1,6 @@
 package game.alias.auth.config;
 
+import game.alias.config.properties.AppConfigProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,9 +26,7 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    @Value("${app.frontend.url}")
-    private String frontendUrl;
-
+    private final AppConfigProperties appConfigProperties;
     private final CookieAuthFilter cookieAuthFilter;
 
     @Bean
@@ -62,7 +61,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         var config = new CorsConfiguration();
-        config.addAllowedOriginPattern(frontendUrl);
+        config.addAllowedOriginPattern(appConfigProperties.frontend().url());
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
         config.setAllowCredentials(true);

@@ -1,43 +1,38 @@
 package game.alias.auth.session;
 
 import java.time.Duration;
-import java.util.Objects;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import game.alias.common.utils.CookieFactory;
+import game.alias.config.properties.SessionConfigProperties;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class AuthCookieService {
 
-    @Value("${session.cookie.auth.name}")
-    private String authCookieName;
-    @Value("${session.cookie.auth.maxAge}")
-    private Duration authCookieMaxAge;
-
+    private final SessionConfigProperties sessionConfig;
     private final CookieFactory cookieFactory;
 
     public ResponseCookie create(@NonNull String token) {
-        Objects.requireNonNull(authCookieName);
-        Objects.requireNonNull(authCookieMaxAge);
+        String name = sessionConfig.cookie().auth().name();
+        Duration maxAge = sessionConfig.cookie().auth().maxAge();
 
-        return cookieFactory.base(authCookieName, token)
+        return cookieFactory.base(name, token)
                 .path("/")
-                .maxAge(authCookieMaxAge)
+                .maxAge(maxAge)
                 .build();
     }
 
     public ResponseCookie clear() {
-        Objects.requireNonNull(authCookieName);
+        String name = sessionConfig.cookie().auth().name();
 
-        return cookieFactory.base(authCookieName, "")
+        return cookieFactory.base(name, "")
                 .path("/")
-                .maxAge(0)
+                .maxAge(Duration.ZERO)
                 .build();
     }
 }

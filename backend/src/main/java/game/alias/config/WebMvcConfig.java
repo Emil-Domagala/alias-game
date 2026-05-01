@@ -1,5 +1,6 @@
 package game.alias.config;
 
+import game.alias.auth.session.resolver.AuthSessionIdCookieValueResolver;
 import game.alias.common.currentUser.CurrentUserHttpArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -12,10 +13,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    private final CurrentUserHttpArgumentResolver resolver;
+    private final CurrentUserHttpArgumentResolver currentUserHttpResolver;
+    private final AuthSessionIdCookieValueResolver authSessionIdResolver;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(resolver);
+        resolvers.add(currentUserHttpResolver);
+        resolvers.add(authSessionIdResolver);
     }
 }

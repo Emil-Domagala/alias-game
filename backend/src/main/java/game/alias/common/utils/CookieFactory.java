@@ -1,5 +1,6 @@
 package game.alias.common.utils;
 
+import game.alias.config.properties.AppConfigProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.lang.NonNull;
@@ -12,12 +13,11 @@ public final class CookieFactory {
 
     public CookieFactory(
             @Value("${spring.profiles.active}") String activeProfile,
-            @Value("${app.frontend.domain}") String domainName) {
+            AppConfigProperties appConfigProperties) {
 
         boolean isLocal = "local".equals(activeProfile);
-
         this.secure = !isLocal;
-        this.domainName = isLocal ? null : domainName;
+        this.domainName = isLocal ? null : appConfigProperties.frontend().domain();
     }
 
     public ResponseCookie.ResponseCookieBuilder base(@NonNull String name, @NonNull String value) {

@@ -6,7 +6,8 @@ import java.time.Duration;
 
 @ConfigurationProperties(prefix = "session")
 public record SessionConfigProperties(
-        Cookie cookie
+        Cookie cookie,
+        Jwt jwt
 ) {
 
     public record Cookie(
@@ -18,4 +19,7 @@ public record SessionConfigProperties(
             Duration maxAge
     ) {}
 
+    public record Jwt(
+            String secret
+    ) {}
 }
