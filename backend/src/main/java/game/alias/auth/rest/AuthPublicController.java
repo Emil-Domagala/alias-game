@@ -1,9 +1,15 @@
 package game.alias.auth.rest;
 
 import game.alias.user.domains.dto.UserDto;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,16 +53,41 @@ public class AuthPublicController {
         return ResponseEntity.ok(authRes.UserDto());
     }
 
+//    @PostMapping("/login")
+//    public ResponseEntity<UserDto> login(@RequestBody @Valid UserLoginRequest userLoginRequest, HttpServletResponse res) {
+//
+//        AuthResponse authRes = authService.login(userLoginRequest);
+//
+//        var sessionCookie = authCookieService.create(authRes.sessionId().toString());
+//
+//        res.addHeader(HttpHeaders.SET_COOKIE, sessionCookie.toString());
+//
+//        return ResponseEntity.ok(authRes.UserDto());
+//    }
+
+    private final AuthenticationManager authManager;
+
+
     @PostMapping("/login")
-    public ResponseEntity<UserDto> login(@RequestBody @Valid UserLoginRequest userLoginRequest, HttpServletResponse res) {
+    public void login(
+            @RequestBody @Valid UserLoginRequest req,
+            HttpServletRequest request
+    ) {
 
-        AuthResponse authRes = authService.login(userLoginRequest);
+        Authentication auth = authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        req.email(),
+                        req.password()
+                )
+        );
 
-        var sessionCookie = authCookieService.create(authRes.sessionId().toString());
+        SecurityContext context =
+                SecurityContextHolder.createEmptyContext();
 
-        res.addHeader(HttpHeaders.SET_COOKIE, sessionCookie.toString());
+        context.setAuthentication(auth);
+        SecurityContextHolder.setContext(context);
 
-        return ResponseEntity.ok(authRes.UserDto());
+        request.getSession(true); // creates Redis-backed session
     }
 
 }

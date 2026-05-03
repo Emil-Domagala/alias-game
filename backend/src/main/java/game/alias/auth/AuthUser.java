@@ -1,5 +1,6 @@
 package game.alias.auth;
 
+import java.security.Principal;
 import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
@@ -17,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthUser implements UserDetails {
+public class AuthUser implements UserDetails, Principal {
 
     private UUID id;
     private String email;
@@ -43,4 +44,8 @@ public class AuthUser implements UserDetails {
         return email;
     }
 
+    @Override
+    public String getName() {
+        return id.toString();
+    }
 }

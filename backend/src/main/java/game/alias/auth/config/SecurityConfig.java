@@ -34,7 +34,7 @@ public class SecurityConfig {
 
         http.csrf(customizer -> customizer.disable());
         http.cors(Customizer.withDefaults());
-        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
         http.authorizeHttpRequests(request -> request
                 .requestMatchers("/ws/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated());
         http.formLogin(form -> form.disable());
         http.httpBasic(basic -> basic.disable());
-        http.addFilterBefore(cookieAuthFilter, UsernamePasswordAuthenticationFilter.class);
+//        http.addFilterBefore(cookieAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

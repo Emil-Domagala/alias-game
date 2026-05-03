@@ -1,12 +1,10 @@
 package game.alias.auth.session;
 
-import java.time.Duration;
 import java.util.Objects;
 import java.util.UUID;
 
 import game.alias.auth.session.exceptions.RedisSessionException;
 import game.alias.config.properties.SessionConfigProperties;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;

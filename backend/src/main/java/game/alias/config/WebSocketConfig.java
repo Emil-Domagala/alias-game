@@ -25,7 +25,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(currentUserArgumentResolver);
+        resolvers.addFirst(currentUserArgumentResolver);
     }
 
     @Override
