@@ -1,5 +1,7 @@
 package game.alias.common;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -20,7 +22,10 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @MappedSuperclass
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class BaseEntity {
+public class BaseEntity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @EqualsAndHashCode.Include

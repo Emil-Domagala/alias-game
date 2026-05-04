@@ -250,3 +250,56 @@ button:disabled{
     max-width: 1280px;
   }
 }
+
+$space-scale: (
+  xxs: var(--space-xxs),
+  xs: var(--space-xs),
+  sm: var(--space-sm),
+  md: var(--space-md),
+  lg: var(--space-lg),
+  xl: var(--space-xl),
+  xxl: var(--space-xxl)
+);
+
+@each $key, $value in $space-scale {
+
+  .mb-#{$key} {
+    margin-bottom: #{$value};
+  }
+
+  .mt-#{$key} {
+    margin-top: #{$value};
+  }
+
+  .ml-#{$key} {
+    margin-left: #{$value};
+  }
+
+  .mr-#{$key} {
+    margin-right: #{$value};
+  }
+
+  .mx-#{$key} {
+    margin-left: #{$value};
+    margin-right: #{$value};
+  }
+
+  .my-#{$key} {
+    margin-top: #{$value};
+    margin-bottom: #{$value};
+  }
+
+  .p-#{$key} {
+    padding: #{$value};
+  }
+
+  .px-#{$key} {
+    padding-left: #{$value};
+    padding-right: #{$value};
+  }
+
+  .py-#{$key} {
+    padding-top: #{$value};
+    padding-bottom: #{$value};
+  }
+}

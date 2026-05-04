@@ -1,6 +1,6 @@
 package game.alias.auth;
 
-import java.security.Principal;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthUser implements UserDetails, Principal {
+public class AuthUser implements UserDetails, Serializable {
 
     private UUID id;
     private String email;
@@ -44,8 +44,4 @@ public class AuthUser implements UserDetails, Principal {
         return email;
     }
 
-    @Override
-    public String getName() {
-        return id.toString();
-    }
 }

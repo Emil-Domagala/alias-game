@@ -1,75 +1,56 @@
-import {Component, OnDestroy, OnInit, inject, signal} from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { WebSocketService } from '../../web-socket.service';
-import {JsonPipe} from '@angular/common';
-import {StompSubscription} from '@stomp/stompjs';
-import {RoomService} from '../room.service';
-import {Chat} from '../../shared/chat/chat';
-import {ConversationType} from '../../shared/message.interface';
-
-interface RoomEvent {
-  type: string;
-  payload: any;
-}
+import {Component, inject, OnDestroy, OnInit, signal} from '@angular/core';
+import { Chat } from '../../shared/chat/chat';
+import {ConversationType, MessageRequest} from '../../shared/message.interface';
+import { UserService } from '../../user/user.service';
+import { RoomMessageService } from './room-message.service';
+import { RoomService } from '../room.service';
+import { Room } from '../room.interface';
+import {SkeletonDirective} from '../../shared/skeleton/skeleton.directive';
 
 @Component({
   selector: 'app-room',
   standalone: true,
   templateUrl: './room.component.html',
-  imports: [
-    JsonPipe,
-    Chat
-  ],
-  styleUrls: ['./room.component.scss']
+  imports: [Chat, SkeletonDirective],
+  styleUrls: ['./room.component.scss'],
 })
 export class RoomComponent implements OnInit, OnDestroy {
-  private wsSub?: StompSubscription;
-  roomId!: string;
+  private roomService = inject(RoomService);
+  private currentUser = inject(UserService).user;
+  private messageService = inject(RoomMessageService);
 
-  roomEvents: RoomEvent[] = [];
-  ws = inject(WebSocketService);
-  route = inject(ActivatedRoute);
-  roomService = inject(RoomService);
-  room = this.roomService.currentRoom
-  teams = signal<any[]>([]);
-  protected messages: any;
+  loading = signal(true);
+  room: Room | undefined;
+  roomId!: string;
+  messages = this.messageService.messages;
 
   ngOnInit() {
-    // Get room ID from route
-    this.roomId = this.route.snapshot.paramMap.get('id')!;
-
-    // Connect if not connected
-    this.ws.connect();
-
-    // Subscribe to room topic
-    this.wsSub = this.ws.subscribe(`/topic/room/${this.roomId}`, (msg: RoomEvent) => {
-      console.log('Room event:', msg);
-      this.roomEvents.push(msg);
-    });
+   void this.loadRoom();
   }
 
-  joinRoom() {
-    // Example: call your REST endpoint or WS command to join
-    console.log(`Joining room ${this.roomId}`);
-    // e.g., roomService.joinRoom(this.roomId, user)
-  }
+  protected async loadRoom(){
+    this.loading.set(true);
 
-  leaveRoom() {
-    // Example: send leave request to backend
-    console.log(`Leaving room ${this.roomId}`);
-    this.roomService.leaveRoom(this.roomId)
+    this.room = (await this.roomService.getCurrentRoom())!;
+
+    if (!this.room) {
+      throw new Error('User is not in a room');
+    }
+
+    this.roomId = this.room.id;
+
+    this.messageService.connect(this.roomId, this.currentUser()?.id!);
+    this.loading.set(false);
   }
 
   ngOnDestroy() {
-    this.leaveRoom();
-    this.wsSub?.unsubscribe();
-    this.ws.disconnect();
+    this.messageService.disconnect();
   }
 
-  protected handleSendMessage($event: any) {
-
+  protected handleSendMessage(message: MessageRequest) {
+    console.log('Sending message:', message);
+    this.messageService.sendMessage(message, this.currentUser()?.id!);
   }
-
 
   protected readonly ConversationType = ConversationType;
 }

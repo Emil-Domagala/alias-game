@@ -1,0 +1,23 @@
+<div class="message-wrapper" [class.own]="isOwnMessage()">
+  <div class="bubble">
+
+    @if(!isOwnMessage()){
+      <div class="sender-nick">
+        {{ message.sender?.nick ?? 'System' }}
+     </div>
+    }
+
+    <div class="content">
+      {{ message.content }}
+    </div>
+
+    <div class="footer">
+      <span class="time">{{ formattedDate() }}</span>
+      @if (isOwnMessage() && message.status){
+        <span class="status">{{ message.status }}</span>
+      }
+    </div>
+
+    <div class="bubble-tail" [class.own]="isOwnMessage()"></div>
+  </div>
+</div>

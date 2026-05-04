@@ -1,5 +1,6 @@
 package game.alias.user.domains;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,7 +37,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class User extends BaseEntity {
+public class User extends BaseEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Column(nullable = false)
     private String nick;

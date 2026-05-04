@@ -60,6 +60,7 @@ export class LoginComponent {
         return undefined;
       } catch (err) {
         const apiError = err as ApiError;
+        console.error(apiError);
         this.toastrService.error(apiError.message, 'Login failed');
         return this.apiErrorMapperService.mapApiErrorToValidationErrors(apiError, this.loginForm);
     }});

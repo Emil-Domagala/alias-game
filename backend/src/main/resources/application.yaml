@@ -27,16 +27,8 @@ server:
 
 app:
   frontend:
-    url: http://localhost:*
+    url: http://localhost:4200
     domain: localhost
-
-session:
-  cookie:
-    auth:
-      name: SESSIONID
-      maxAge: 1h
-  jwt:
-    secret: FWFy678FEWF7632gfwen89dsffewrfeqwffd37r6FEWHIFsdabhjb57FDEWF
 
 logging:
   level:

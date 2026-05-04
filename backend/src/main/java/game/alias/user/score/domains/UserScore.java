@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @Entity
@@ -18,7 +20,9 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "user_scores")
-public class UserScore extends BaseEntity {
+public class UserScore extends BaseEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Builder.Default
     @Column(nullable = false)
@@ -34,10 +38,10 @@ public class UserScore extends BaseEntity {
 
     @Builder.Default
     @Column(nullable = false)
-    private Integer gamesLost = 0;
+    private Integer gamesTied = 0;
 
     @Builder.Default
     @Column(nullable = false)
-    private Integer gamesTied = 0;
+    private Integer gamesLost = 0;
 
 }

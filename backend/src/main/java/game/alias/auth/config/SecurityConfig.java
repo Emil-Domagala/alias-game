@@ -1,7 +1,6 @@
 package game.alias.auth.config;
 
 import game.alias.config.properties.AppConfigProperties;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,12 +12,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import game.alias.auth.session.CookieAuthFilter;
 import game.alias.common.ApiVersion;
 import lombok.RequiredArgsConstructor;
 
@@ -27,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final AppConfigProperties appConfigProperties;
-    private final CookieAuthFilter cookieAuthFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -42,7 +39,6 @@ public class SecurityConfig {
                 .anyRequest().authenticated());
         http.formLogin(form -> form.disable());
         http.httpBasic(basic -> basic.disable());
-//        http.addFilterBefore(cookieAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
