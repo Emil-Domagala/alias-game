@@ -59,4 +59,12 @@ export class WebSocketService {
     this.client.deactivate();
     this.client = undefined;
   }
+
+  publish({ destination, body }: { destination: string; body: string }) {
+    if(!this.connected()) return
+    this.client!.publish({
+      destination,
+      body,
+    });
+  }
 }

@@ -1,12 +1,7 @@
 <div class="chat-container">
   <div class="chat-messages">
-    @for (msg of messages(); track msg.id){
-    <div
-      class="chat-message"
-      [class.self]="msg.sender?.id === currentUser()?.id">
-      <span class="chat-sender">{{ msg.sender?.nick || 'System' }}:</span>
-      <span class="chat-content">{{ msg.content }}</span>
-    </div>
+    @for (msg of messages(); track msg.id ?? msg.tempId){
+      <app-message [message]="msg" />
     }
   </div>
 
@@ -21,7 +16,7 @@
     }
   </div>
   }
-  <!-- Input area -->
+
   <form (submit)="submitMessage(); $event.preventDefault()" class="chat-input-form">
     <input
       type="text"

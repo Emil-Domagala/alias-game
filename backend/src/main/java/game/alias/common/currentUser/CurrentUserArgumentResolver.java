@@ -1,6 +1,7 @@
 package game.alias.common.currentUser;
 
 import game.alias.auth.AuthUser;
+import game.alias.auth.ws.WsUserPrincipal;
 import org.springframework.core.MethodParameter;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
@@ -31,6 +32,8 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
 
                 if (principal instanceof Authentication auth) {
                     return auth.getPrincipal();
+                } else if (principal instanceof WsUserPrincipal(AuthUser user)) {
+                    return user;
                 }
             }
         }

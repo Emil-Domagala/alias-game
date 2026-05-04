@@ -1,7 +1,7 @@
 package game.alias.config;
 
-import game.alias.auth.session.WebSocketAuthInterceptor;
-import game.alias.auth.session.WebSocketPrincipalHandler;
+import game.alias.auth.ws.AuthHandshakeInterceptor;
+import game.alias.auth.ws.UserIdHandshakeHandler;
 import game.alias.common.WebSocketDestinations;
 import game.alias.common.currentUser.CurrentUserArgumentResolver;
 import lombok.RequiredArgsConstructor;
@@ -13,26 +13,25 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.lang.NonNull;
 
+
 import java.util.List;
 
 @Configuration
 @EnableWebSocketMessageBroker
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-    private final WebSocketAuthInterceptor webSocketAuthInterceptor;
-    private final WebSocketPrincipalHandler webSocketPrincipalHandler;
     private final CurrentUserArgumentResolver currentUserArgumentResolver;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(currentUserArgumentResolver);
+        resolvers.addFirst(currentUserArgumentResolver);
     }
 
     @Override
     public void registerStompEndpoints(@NonNull StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .addInterceptors(webSocketAuthInterceptor)
-                .setHandshakeHandler(webSocketPrincipalHandler)
+                .addInterceptors(new AuthHandshakeInterceptor())
+                .setHandshakeHandler(new UserIdHandshakeHandler())
                 .setAllowedOriginPatterns("http://localhost:4200");
 //                .withSockJS();
     }

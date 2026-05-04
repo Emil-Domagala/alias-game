@@ -1,0 +1,50 @@
+:host {
+  position: relative;
+  display: block;
+  background: var(--skeleton-base);
+  overflow: hidden;
+
+  /* radius variants */
+  &.sm { border-radius: var(--radius-sm); }
+  &.md { border-radius: var(--radius-md); }
+  &.lg { border-radius: var(--radius-lg); }
+  &.pill { border-radius: var(--radius-pill); }
+
+  &.rounded {
+    border-radius: var(--radius-md);
+  }
+
+  /* pulse */
+  &.pulse {
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+
+  /* shimmer */
+  &.shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.08),
+        transparent
+    );
+    animation: shimmer 1.2s infinite;
+  }
+
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  &.none::after {
+    display: none;
+  } }

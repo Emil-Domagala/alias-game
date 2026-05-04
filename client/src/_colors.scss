@@ -1,5 +1,8 @@
 :root,
 .theme-dark {
+  --skeleton-base: #232860;
+  --skeleton-highlight: rgba(255, 255, 255, 0.06);
+
   --background: #0F1220;
   --background-surface: #181C2F;
   --background-surface-secondary: #20254A;
@@ -43,6 +46,9 @@
 }
 
 .theme-contrast {
+  --skeleton-base: #222;
+  --skeleton-highlight: rgba(255, 255, 255, 0.25);
+
   --background: #000000;
   --background-surface: #0A0A0A;
   --background-surface-secondary: #111111;
@@ -87,6 +93,9 @@
 }
 
 .theme-light {
+  --skeleton-base: #E3E6FF;
+  --skeleton-highlight: rgba(255, 255, 255, 0.7);
+
   --background: #F6F7FF;
   --background-surface: #FFFFFF;
   --background-surface-secondary: #EEF0FF;

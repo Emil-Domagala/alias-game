@@ -1,10 +1,24 @@
 <div class="room">
-
   <!-- Header -->
   <header class="room-header">
     <div class="room-info">
-      <h2 class="room-title">{{ room()?.name }}</h2>
-      <span class="room-id">ID: {{ room()?.id }}</span>
+      <h2 class="room-title"
+          *skeleton="
+              loading();
+              width: '40%';
+              height: 'var(--font-lg)';
+              variant: 'pill';
+              animate: 'pulse';
+              extraClass: 'mb-xs'
+      ">{{ room?.name }}</h2>
+      <span class="room-id">ID: <span
+        *skeleton="
+              loading();
+              width: '40%';
+              height: 'var(--font-xs)';
+              variant: 'pill';
+              animate: 'pulse';
+      ">{{ room?.id }}</span></span>
     </div>
 
     <div class="room-actions">
@@ -21,33 +35,39 @@
       <h3 class="section-title">Teams</h3>
 
       <div class="teams">
-        <div class="team" *ngFor="let team of teams()">
-          <div class="team-header">
-            <span>{{ team.name }}</span>
-            <button class="btn btn-outline-primary btn-sm">Join</button>
-          </div>
+        <!--          @if (teams()) {-->
+        <!--            @for (team of teams(); track team.id) {-->
+        <!--              <div class="team">-->
+        <!--                <div class="team-header">-->
+        <!--                  <span>{{ team.name }}</span>-->
+        <!--                  <button class="btn btn-outline-primary btn-sm">Join</button>-->
+        <!--                </div>-->
 
-          <div class="team-players">
-            <div class="player" *ngFor="let p of team.players">
-              {{ p.nick }}
-            </div>
-          </div>
-        </div>
+        <!--                <div class="team-players">-->
+        <!--                  @for (p of team.players; track p.id) {-->
+        <!--                    <div class="player">-->
+        <!--                      {{ p.nick }}-->
+        <!--                    </div>-->
+        <!--                  }-->
+        <!--                </div>-->
+        <!--              </div>-->
+        <!--            }-->
+        <!--          }-->
       </div>
 
       <button class="btn btn-primary full-width">Create Team</button>
     </aside>
 
-    <!-- CENTER: Main content (Chat / Game later) -->
     <main class="room-main">
       <!-- For now: Chat placeholder -->
-      <app-chat
-        [messages]="messages"
-        [baseConversationType]="ConversationType.ROOM"
-        [currentRoom]="room()!"
-        [teams]="teams()"
-        (sendMessage)="handleSendMessage($event)"
-      ></app-chat>
+      @if (!loading()) {
+        <app-chat
+          [messages]="messages()"
+          [baseConversationType]="ConversationType.ROOM"
+          [currentRoom]="room!"
+          (sendMessage)="handleSendMessage($event)"
+        ></app-chat>
+      }
     </main>
 
     <!-- RIGHT: Controls -->
@@ -67,3 +87,5 @@
 
   </div>
 </div>
+
+

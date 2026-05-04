@@ -1,7 +1,6 @@
 package game.alias.auth.rest.services;
 
 import java.util.Set;
-import java.util.UUID;
 
 import game.alias.auth.domains.UserRole;
 import game.alias.user.UserService;
@@ -11,16 +10,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import game.alias.auth.AuthUser;
-import game.alias.auth.domains.AuthUserMapper;
-import game.alias.auth.domains.dto.AuthResponse;
 import game.alias.auth.domains.request.UserLoginRequest;
 import game.alias.auth.domains.request.UserRegisterRequest;
-import game.alias.auth.session.JwtService;
-import game.alias.auth.session.RedisAuthUserService;
 import game.alias.user.domains.User;
 import game.alias.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,14 +29,10 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
-    private final RedisAuthUserService redisAuthService;
-    private final AuthUserMapper authUserMapper;
     private final UserService userService;
 
     @Override
-    public AuthResponse register(@NonNull UserRegisterRequest request) {
-        log.debug("UserRegisterRequest {}", request);
+    public User register(@NonNull UserRegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("Email already taken");
         }
@@ -57,44 +50,28 @@ public class AuthServiceImpl implements AuthService {
 
         var sUser = userRepository.save(user);
 
-        log.debug("sUser {}", sUser);
+        AuthUser authUser = new AuthUser(user.getId(), user.getEmail(), user.getNick(), user.getPassword(), user.getRoles());
 
-        AuthUser authUser = new AuthUser(sUser.getId(), sUser.getEmail(),sUser.getNick(), sUser.getPassword(), sUser.getRoles());
 
-        log.debug("authUser {}", authUser);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(authUser,
+                null,
+                authUser.getAuthorities()
+        );
 
-        var sessionId = createSessionTokenAndSaveUserToRedis(authUser);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        UserDto userDto = UserMapper.toDto(sUser);
-
-        return new AuthResponse(sessionId, userDto);
+        return sUser;
     }
 
     @Override
-    public AuthResponse login(@NonNull UserLoginRequest request) {
-        var auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.email(),
-                        request.password()));
+    public User login(@NonNull UserLoginRequest request) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+        AuthUser authUser = (AuthUser) authentication.getPrincipal();
 
-        var sessionId = createSessionTokenAndSaveUserToRedis((AuthUser) auth.getPrincipal());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        var user = userService.loadOrThrow(((AuthUser) auth.getPrincipal()).getId());
-        var userDto = UserMapper.toDto(user);
-        return new AuthResponse(sessionId, userDto);
+        return userService.loadOrThrow(authUser.getId());
     }
 
-    private String createSessionTokenAndSaveUserToRedis(@NonNull AuthUser user) {
-        UUID sessionId = UUID.randomUUID();
-        String token = jwtService.generateSessionToken(sessionId);
-        redisAuthService.saveUser(user, sessionId);
-
-        return token;
-    }
-
-    @Override
-    public void logout(@NonNull String sessionId) {
-        redisAuthService.removeUser(sessionId);
-    }
 
 }

@@ -16,6 +16,9 @@
   background: var(--background-surface);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
+  .room-info{
+    width: 100%;
+  }
 
   .room-title {
     font-size: var(--font-lg);
@@ -23,6 +26,9 @@
   }
 
   .room-id {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xxs);
     font-size: var(--font-xs);
     color: var(--text-muted);
   }

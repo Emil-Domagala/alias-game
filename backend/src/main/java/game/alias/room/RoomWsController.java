@@ -12,7 +12,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+
+import java.security.Principal;
 
 @Controller
 @RequiredArgsConstructor
@@ -22,8 +25,11 @@ public class RoomWsController {
     private final MessageMapper mapper;
 
     @MessageMapping(RoomWsDestinations.SEND_MESSAGE)
-    public void sendMessage(@Valid @Payload MessageRequest message, @CurrentUser AuthUser currentUser){
-
+    public void sendMessage(@Valid @Payload MessageRequest message,
+                            @CurrentUser AuthUser currentUser,
+                            Principal p,
+                            @AuthenticationPrincipal AuthUser ap
+    ){
         Message msg = service.sendMessage(message, currentUser);
         var msgDto = mapper.toMessageDto(msg);
         var messageSendConfirmationDto =  mapper.toMessageSendConfirmationDto(message.tempId(), msg);

@@ -1,30 +1,28 @@
 import {Component, inject, input, output, signal} from '@angular/core';
-import {ChatMessage, ConversationType} from '../message.interface';
+import { ChatMessageWithState, ConversationType, MessageRequest} from '../message.interface';
 import {UserService} from '../../user/user.service';
 import {Player} from '../player.interface';
 import {Room} from '../../room/room.interface';
-
-export interface ParsedMessage {
-  content: string;
-  conversationType: ConversationType;
-  conversationId: string;
-}
+import { v4 as uuidv4 } from 'uuid';
+import {MessageComponent} from './message/message.component';
 
 @Component({
   selector: 'app-chat',
-  imports: [],
+  imports: [
+    MessageComponent
+  ],
   templateUrl: './chat.html',
   styleUrl: './chat.scss',
 })
 export class Chat {
   baseConversationType = input.required<Exclude<ConversationType, 'DIRECT'>>();
-  messages = input.required<ChatMessage[]>();
+  messages = input.required<ChatMessageWithState[]>();
   currentRoom = input.required<Room>();
 
   currentTeam = input<{ id: string; players: Player[] }>();
   teams = input<{ id: string; players: Player[] }[]>([]);
 
-  sendMessage = output<ParsedMessage>();
+  sendMessage = output<MessageRequest>();
 
   private userService = inject(UserService);
   currentUser = this.userService.user;
@@ -55,7 +53,7 @@ export class Chat {
       suggestions = teams.flatMap(t => t.players)
         .filter(p => p.nick.toLowerCase().startsWith(query));
     }
-
+    console.log('suggestions', suggestions);
     this.mentionSuggestions.set(suggestions);
   }
 
@@ -95,15 +93,15 @@ export class Chat {
     }
 
     this.sendMessage.emit({
+      tempId: uuidv4(),
       content: raw,
       conversationType: convType,
       conversationId: convId,
+      targetUserId: playerMention?.id ?? undefined,
     });
 
     this.newMessage.set('');
     this.mentionSuggestions.set([]);
     this.mentionedEntity.set(undefined);
   }
-
-
 }
