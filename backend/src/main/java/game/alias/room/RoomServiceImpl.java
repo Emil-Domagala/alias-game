@@ -10,8 +10,6 @@ import game.alias.player.domains.Player;
 import game.alias.room.domains.Room;
 import game.alias.room.domains.RoomException;
 import game.alias.room.domains.RoomStatus;
-import game.alias.room.domains.dto.RoomWithPlayers;
-import game.alias.room.domains.dto.RoomWithUsers;
 import game.alias.room.domains.request.CreateRoomRequest;
 import game.alias.user.UserService;
 import game.alias.user.domains.User;

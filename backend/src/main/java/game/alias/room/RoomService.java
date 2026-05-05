@@ -5,8 +5,6 @@ import game.alias.common.pagination.PaginationResult;
 import game.alias.common.pagination.QueryConfigModel;
 import game.alias.common.pagination.QueryFilter;
 import game.alias.room.domains.Room;
-import game.alias.room.domains.dto.RoomWithPlayers;
-import game.alias.room.domains.dto.RoomWithUsers;
 import game.alias.room.domains.request.CreateRoomRequest;
 import org.springframework.data.domain.Pageable;
 

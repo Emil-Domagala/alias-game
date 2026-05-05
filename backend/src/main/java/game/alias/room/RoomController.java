@@ -7,7 +7,7 @@ import game.alias.common.pagination.*;
 import game.alias.player.domains.Player;
 import game.alias.room.domains.Room;
 import game.alias.room.domains.RoomMapper;
-import game.alias.room.domains.dto.RoomDto;
+import game.alias.room.domains.dto.RoomSummaryDto;
 import game.alias.room.domains.request.CreateRoomRequest;
 import game.alias.player.PlayerService;
 import jakarta.validation.Valid;
@@ -38,10 +38,10 @@ public class RoomController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<RoomDto>createRoom(@Valid @RequestBody CreateRoomRequest request, @CurrentUser AuthUser user){
+    public ResponseEntity<RoomSummaryDto>createRoom(@Valid @RequestBody CreateRoomRequest request, @CurrentUser AuthUser user){
         var room = service.create(request, user);
         var ownerPlayer = playerService.cashePlayer(user);
-        var roomDto = mapper.toRoomDto(room, ownerPlayer);
+        var roomDto = mapper.toRoomSummaryDto(room, ownerPlayer);
         URI location = URI.create("/room/" + room.getId());
         return ResponseEntity.created(location).body(roomDto);
     }
@@ -53,7 +53,7 @@ public class RoomController {
     }
 
     @GetMapping()
-    public ResponseEntity<PaginationResult<RoomDto>>getRooms(
+    public ResponseEntity<PaginationResult<RoomSummaryDto>>getRooms(
             Pageable pageable,
             @RequestParam(required = false) List<String> filters,
             @RequestParam(required = false) String search
@@ -67,9 +67,9 @@ public class RoomController {
         PaginationResult<Room> paginatedRooms = service.getRooms(validatedPageable, filterList,  search, config);
         Set<UUID> ownersId = paginatedRooms.getContent().stream().map(Room::getOwnerId).collect(Collectors.toSet());
         Map<UUID, Player> ownersById = playerService.loadExistingPlayers(ownersId).stream().collect(Collectors.toMap(Player::getId, Function.identity()));
-        List<RoomDto> roomDtos = paginatedRooms.getContent().stream().map(room->mapper.toRoomDto(room,ownersById.get(room.getOwnerId()))).toList();
+        List<RoomSummaryDto> roomDtos = paginatedRooms.getContent().stream().map(room->mapper.toRoomSummaryDto(room,ownersById.get(room.getOwnerId()))).toList();
 
-        PaginationResult<RoomDto> result =
+        PaginationResult<RoomSummaryDto> result =
                 new PaginationResult<>(
                         roomDtos,
                         paginatedRooms.getTotalPages(),
@@ -83,16 +83,16 @@ public class RoomController {
     }
 
     @PostMapping("/{roomId}/join")
-    public ResponseEntity<RoomDto>joinRoom(@PathVariable UUID roomId, @CurrentUser AuthUser user){
+    public ResponseEntity<RoomSummaryDto>joinRoom(@PathVariable UUID roomId, @CurrentUser AuthUser user){
         Room room = service.joinRoom(roomId, user);
         Player currentPlayer = playerService.cashePlayer(user);
-        RoomDto roomDto = mapper.toRoomDto(room, currentPlayer);
+        RoomSummaryDto roomDto = mapper.toRoomSummaryDto(room, currentPlayer);
 
         return ResponseEntity.ok(roomDto);
     }
 
     @PostMapping("/{roomId}/leave")
-    public ResponseEntity<RoomDto>leaveRoom(@PathVariable UUID roomId, @CurrentUser AuthUser user){
+    public ResponseEntity<RoomSummaryDto>leaveRoom(@PathVariable UUID roomId, @CurrentUser AuthUser user){
         Room room = service.leaveRoom(roomId, user);
 
         // If user was owner and deleted room, room will no longer exist
@@ -101,13 +101,13 @@ public class RoomController {
         }
 
         Player currentPlayer = playerService.cashePlayer(user);
-        RoomDto roomDto = mapper.toRoomDto(room, currentPlayer);
+        RoomSummaryDto roomDto = mapper.toRoomSummaryDto(room, currentPlayer);
 
         return ResponseEntity.ok(roomDto);
     }
 
     @GetMapping("/current")
-    public ResponseEntity<RoomDto> getCurrentRoom(@CurrentUser AuthUser user) {
+    public ResponseEntity<RoomSummaryDto> getCurrentRoom(@CurrentUser AuthUser user) {
         Optional<Room> roomOpt = service.findRoomByPlayer(user.getId());
 
         if (roomOpt.isEmpty()) {
@@ -116,7 +116,7 @@ public class RoomController {
 
         Room room = roomOpt.get();
         var player = playerService.cashePlayer(user);
-        RoomDto roomDto = mapper.toRoomDto(room, player);
+        RoomSummaryDto roomDto = mapper.toRoomSummaryDto(room, player);
 
         return ResponseEntity.ok(roomDto);
     }
