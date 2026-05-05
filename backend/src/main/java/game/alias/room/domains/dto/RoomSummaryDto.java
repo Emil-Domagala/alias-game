@@ -6,7 +6,7 @@ import game.alias.player.domains.dto.PlayerDto;
 import java.util.Set;
 import java.util.UUID;
 
-public record RoomDto(
+public record RoomSummaryDto(
         UUID id,
         String name,
         PlayerDto owner,
